@@ -6,6 +6,26 @@ Permet à une IA (Claude Code, Claude Desktop…) de lire et modifier le modèle
 IA ──MCP (stdio)──> mcp_server/vroid_mcp.py ──HTTP 127.0.0.1:7811──> plugin BepInEx (dans VRoid) ──> VRoidCore.Editing.Context
 ```
 
+## Installation (release)
+
+1. Télécharger `VRoidMcp-v<version>.zip` depuis les releases GitHub et le décompresser.
+2. Fermer VRoid Studio, puis double-cliquer sur `Installer.cmd`.
+
+L'installeur :
+- trouve VRoid Studio dans les bibliothèques Steam (sinon : `Installer.cmd -GameDir "<dossier de VRoid Studio>"`) ;
+- installe BepInEx 6.0.0-be.791 (IL2CPP) s'il manque, après avoir mis de côté une autre version (BepInEx 5...)
+  dans `BepInEx_sauvegarde_<date>` ; un BepInEx 6 déjà en place est conservé (`-ForceBepInEx` pour le remplacer).
+  L'archive est téléchargée depuis builds.bepinex.dev et son empreinte SHA-256 vérifiée ;
+- copie le plugin dans `BepInEx\plugins\VRoidMcpBridge` ;
+- copie le serveur MCP, les outils et la documentation dans `%LOCALAPPDATA%\VRoidMcp` (cache des presets local,
+  jamais écrasé) ;
+- déclare le serveur `vroid` dans Claude Code (`~/.claude.json`) et Claude Desktop, avec sauvegarde
+  (`-NoClaude` pour ne pas le faire).
+
+Prérequis : Windows, Python 3.8+ (numpy et Pillow conseillés pour les vignettes et les textures).
+Mise à jour : relancer l'installeur d'une version plus récente. Désinstallation : `Installer.cmd -Uninstall`.
+Premier lancement après installation de BepInEx : une à deux minutes de plus (génération de l'interop).
+
 ## Composants
 
 | Élément | Emplacement |
