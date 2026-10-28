@@ -1,0 +1,19 @@
+# Compilation
+VRoidMcpBridge/bin/
+VRoidMcpBridge/obj/
+__pycache__/
+*.pyc
+
+# Fichiers de travail (captures, textures exportées)
+out/
+out_*.png
+*.tmp
+
+# Sauvegarde locale de l'ancien BepInEx 5 et de plugins tiers
+backup_bepinex5/
+
+# Données du cache des presets (locales, jamais versionnées)
+preset_cache/
+
+# Paquets de release
+dist/

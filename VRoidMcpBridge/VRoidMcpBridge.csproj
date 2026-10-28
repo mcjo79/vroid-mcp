@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>VRoidMcpBridge</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <!-- Dossier d'installation de VRoid Studio -->
+    <GameDir>D:\steam\steamapps\common\VRoid Studio</GameDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="$(GameDir)\BepInEx\core\BepInEx.Core.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\BepInEx.Unity.IL2CPP.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\Il2CppInterop.Runtime.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\Il2CppInterop.Common.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\0Harmony.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\Il2Cppmscorlib.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\UnityEngine.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\UnityEngine.CoreModule.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\UnityEngine.AnimationModule.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\UnityEngine.ScreenCaptureModule.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\UnityEngine.ImageConversionModule.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\VRoidCore.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\VRoidCore.Protobuf.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\VRoid.Studio.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\VRoidStudio.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\VRoid.UI.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\VRoid.App.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\PlayFab.dll" Private="false" />
+  </ItemGroup>
+
+  <!-- Copie automatique du plugin dans BepInEx\plugins après compilation -->
+  <Target Name="CopyToPlugins" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(GameDir)\BepInEx\plugins\VRoidMcpBridge" />
+  </Target>
+</Project>
