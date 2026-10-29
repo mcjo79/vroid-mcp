@@ -22,6 +22,114 @@ import tool_i18n  # noqa: E402
 BRIDGE = os.environ.get("VROID_BRIDGE_URL", "http://127.0.0.1:7811")
 PROTOCOL_VERSION = "2025-06-18"
 
+# Agent-facing reference (docs/AGENT_REFERENCE_EN.md), exposed as MCP resources so
+# Harness can load only the section it needs instead of injecting 80+ KiB at startup.
+AGENT_REFERENCE_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "docs", "AGENT_REFERENCE_EN.md",
+)
+AGENT_RESOURCE_GROUPS = (
+    ("reference", "VRoid Agent Reference (full)",
+     "Complete English reference: tools, all parameter categories, physical values, expressions and workflows.",
+     None),
+    ("start", "Agent Reference — Start, lifecycle and UI map",
+     "Startup contract, lifecycle rules and the section/category access map.",
+     ("What is available", "Start and lifecycle", "UI map and access modes")),
+    ("face", "Agent Reference — Face parameters",
+     "Face categories, sliders, colors and per-category parameter keys.",
+     ("Face parameters",)),
+    ("hairstyle", "Agent Reference — Hairstyle parameters",
+     "Hair presets, procedural/brush groups, hair colors and textures.",
+     ("Hairstyle parameters",)),
+    ("body", "Agent Reference — Body parameters",
+     "Body proportions, silhouette and material parameters.",
+     ("Body parameters",)),
+    ("outfit", "Agent Reference — Outfit parameters",
+     "Clothing presets, simple colors and complex texture editing.",
+     ("Outfit parameters",)),
+    ("accessories", "Agent Reference — Accessories",
+     "Accessory preset slots and how to remove or texture-edit them.",
+     ("Accessories parameters",)),
+    ("look", "Agent Reference — Look parameters",
+     "Fixed preset, mouth line, nose lighting and overlay presets.",
+     ("Look parameters",)),
+    ("physical", "Agent Reference — Physical and face details",
+     "Height/weight, iris size, ears, teeth, lips and the expression preview limits.",
+     ("Physical parameters, iris, ears, teeth and mouth",)),
+    ("presets", "Agent Reference — Preset categories",
+     "Preset categories, replacement slots and whole-set behavior.",
+     ("Preset categories and replacement slots",)),
+    ("tools", "Agent Reference — All MCP tools",
+     "All 52 tools with descriptions, argument schemas and constraints.",
+     ("Complete MCP tool reference",)),
+    ("workflows", "Agent Reference — Workflows and value rules",
+     "Normalized 0..1 rules, paired sliders and agent workflows.",
+     ("Normalized 0..1 and paired-slider rules", "Workflows an agent can follow")),
+    ("troubleshooting", "Agent Reference — Errors and source of truth",
+     "Failure modes, recovery and the drift-control contract.",
+     ("Failure modes and recovery", "Source of truth and drift control")),
+)
+
+
+def _agent_reference_document():
+    try:
+        with open(AGENT_REFERENCE_PATH, encoding="utf-8") as fh:
+            return fh.read()
+    except OSError:
+        return None
+
+
+def _agent_heading_blocks(text):
+    blocks = {}
+    for part in re.split(r"(?m)^## ", text)[1:]:
+        title, _, body = part.partition("\n")
+        blocks[title.strip()] = "## " + part
+    return blocks
+
+
+def agent_resources():
+    """MCP resources/list payload for the agent reference."""
+    return {
+        "resources": [
+            {
+                "uri": "vroid://agent/" + slug,
+                "name": name,
+                "description": description,
+                "mimeType": "text/markdown",
+            }
+            for slug, name, description, _ in AGENT_RESOURCE_GROUPS
+        ]
+    }
+
+
+def read_agent_resource(uri):
+    """MCP resources/read payload; loads one section (or the whole reference)."""
+    slug = (uri or "").strip()
+    if slug.startswith("vroid://agent/"):
+        slug = slug[len("vroid://agent/"):]
+    group = next((g for g in AGENT_RESOURCE_GROUPS if g[0] == slug), None)
+    if group is None:
+        raise KeyError(uri)
+    text = _agent_reference_document()
+    if text is None:
+        text = ("# VRoid Agent Reference not installed\n\n"
+                "The MCP server is running, but docs/AGENT_REFERENCE_EN.md is missing. "
+                "Reinstall the release package or read `vroid_help(topic='overview')`.\n")
+    else:
+        headings = group[3]
+        if headings:
+            blocks = _agent_heading_blocks(text)
+            text = "\n\n".join(blocks[h] for h in headings if h in blocks)
+            if not text:
+                text = f"# {group[1]}\n\nThis section is not present in the installed reference.\n"
+    return {
+        "contents": [{
+            "uri": "vroid://agent/" + slug,
+            "mimeType": "text/markdown",
+            "text": text,
+        }]
+    }
+
 
 def call_bridge(path, body=None, query=None, timeout=30):
     url = BRIDGE + path
@@ -1626,7 +1734,7 @@ def handle(msg):
     if method == "initialize":
         return {
             "protocolVersion": params.get("protocolVersion", PROTOCOL_VERSION),
-            "capabilities": {"tools": {}, "prompts": {}},
+            "capabilities": {"tools": {}, "prompts": {}, "resources": {}},
             "serverInfo": {"name": "vroid-studio", "version": "0.12.0"},
             "instructions": help_i18n.INITIALIZE_INSTRUCTIONS,
         }
@@ -1634,6 +1742,10 @@ def handle(msg):
         return {}
     if method == "tools/list":
         return {"tools": TOOLS}
+    if method == "resources/list":
+        return agent_resources()
+    if method == "resources/read":
+        return read_agent_resource(params.get("uri"))
     if method == "prompts/list":
         return {"prompts": [{
             "name": "help",

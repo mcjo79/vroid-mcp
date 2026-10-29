@@ -591,6 +591,12 @@ def main() -> None:
         "- **Preset cache tools** can search without VRoid; `vroid_preset_cache_*` does not require an open model.",
         "- The HTTP bridge listens on `127.0.0.1:7811`; the MCP server runs over stdio.",
         "",
+        "The same reference is exposed as MCP **resources**, so an agent can load one section "
+        "without injecting the whole file: `vroid://agent/reference` (full), `vroid://agent/start`, "
+        "`face`, `hairstyle`, `body`, `outfit`, `accessories`, `look`, `physical`, `presets`, `tools`, "
+        "`workflows`, `troubleshooting`. `initialize.instructions` carries the short contract and the "
+        "resource list; `tools/list` remains the authoritative JSON-schema source.",
+        "",
         "## 2. Start and lifecycle",
         "",
         "Always start with:",

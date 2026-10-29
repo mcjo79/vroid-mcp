@@ -106,7 +106,9 @@ For an AI agent using the server through MCP (including DeepSeek Harness), see
 [`docs/AGENT_REFERENCE_EN.md`](docs/AGENT_REFERENCE_EN.md): the complete English
 agent reference covering all 52 tools and every section/category parameter, with
 physical parameters and facial-expression limits. It is generated from the live
-registry with `python tools/gen_agent_reference_en.py`.
+registry with `python tools/gen_agent_reference_en.py`. Harness receives the short
+contract through MCP `initialize`, all tool schemas through `tools/list`, and this
+reference on demand through MCP resources under `vroid://agent/`.
 
 ## Editing textures
 

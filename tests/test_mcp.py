@@ -192,6 +192,32 @@ class HelpTests(unittest.TestCase):
         })
         self.assertGreater(len(result["messages"][0]["content"]["text"]), 40)
 
+    def test_agent_reference_resources(self):
+        init = vroid_mcp.handle({"method": "initialize", "params": {}})
+        self.assertIn("resources", init["capabilities"])
+        self.assertIn("vroid://agent/reference", init["instructions"])
+
+        listing = vroid_mcp.handle({"method": "resources/list", "params": {}})
+        uris = {r["uri"] for r in listing["resources"]}
+        for expected in (
+            "vroid://agent/reference",
+            "vroid://agent/face",
+            "vroid://agent/body",
+            "vroid://agent/outfit",
+            "vroid://agent/accessories",
+            "vroid://agent/look",
+            "vroid://agent/physical",
+            "vroid://agent/tools",
+        ):
+            self.assertIn(expected, uris)
+
+        full = vroid_mcp.handle({"method": "resources/read", "params": {"uri": "vroid://agent/reference"}})
+        face = vroid_mcp.handle({"method": "resources/read", "params": {"uri": "vroid://agent/face"}})
+        tools = vroid_mcp.handle({"method": "resources/read", "params": {"uri": "vroid://agent/tools"}})
+        self.assertGreater(len(full["contents"][0]["text"]), 10000)
+        self.assertIn("## Face parameters", face["contents"][0]["text"])
+        self.assertIn("Complete MCP tool reference", tools["contents"][0]["text"])
+
 
 class BatchTests(unittest.TestCase):
     def test_sequential_local_operations(self):

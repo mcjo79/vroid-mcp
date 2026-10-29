@@ -55,7 +55,11 @@ INITIALIZE_INSTRUCTIONS = (
     "before applying presets. For sequences, use vroid_batch (up to 200 sequential operations, "
     "no automatic rollback). Do not assume that one preset replaces only one slot: whole outfits "
     "can replace several slots; verify with vroid_list_groups. Thumbnail generation strips all "
-    "clothes, underwear and hair except the tested item."
+    "clothes, underwear and hair except the tested item. "
+    "An English Agent Reference is exposed as MCP resources: vroid://agent/reference (full), "
+    "plus vroid://agent/start, face, hairstyle, body, outfit, accessories, look, physical, presets, "
+    "tools, workflows and troubleshooting. Read only the section needed; tools/list stays the "
+    "authoritative schema list."
 )
 
 HELP = {
