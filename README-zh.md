@@ -7,10 +7,10 @@
 ## 环境要求
 
 - Windows 与 VRoid Studio 2.14
-- **Python 3.8+ 已加入 PATH**（`python --version` 或 `py -0p` 可用）
+- **已内置 Python 3.12**（无需安装；有网络时会自动安装 numpy 和 Pillow）
 - BepInEx 6 IL2CPP（由安装器安装）
 
-如果 PATH 中没有 Python，安装器会尝试 `py` 启动器；仍找不到时，请重新安装 Python 并勾选“Add Python to PATH”。
+安装器直接使用包内的 `python\python.exe`，无需配置 PATH。
 
 ## 安装
 

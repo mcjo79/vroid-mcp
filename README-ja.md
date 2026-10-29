@@ -7,10 +7,10 @@ VRoid Studio で開いているモデルを AI（Claude Code、Claude Desktop、
 ## 必要環境
 
 - Windows と VRoid Studio 2.14
-- **Python 3.8 以上を PATH に追加**（`python --version` または `py -0p` が通ること）
+- **Python 3.12 を同梱**（インストール不要。numpy と Pillow はネットワークがあれば自動導入）
 - BepInEx 6 IL2CPP（インストーラーが導入）
 
-Python が PATH にない場合、インストーラーは `py` ランチャーを探します。見つからない場合は Python を「Add Python to PATH」付きで再インストールしてください。
+Python はパッケージ内の `python\python.exe` が使われるため、PATH の設定は不要です。
 
 ## インストール
 

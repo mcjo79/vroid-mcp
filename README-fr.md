@@ -24,7 +24,7 @@ L'installeur :
 - déclare le serveur `vroid` dans Claude Code (`~/.claude.json`) et Claude Desktop, avec sauvegarde
   (`-NoClaude` pour ne pas le faire).
 
-Prérequis : Windows, Python 3.8+ disponible dans le PATH (numpy et Pillow conseillés pour les vignettes et les textures).
+Prérequis : Windows 10/11. Python 3.12 est **embarqué** dans le paquet — rien à installer (numpy et Pillow sont installés automatiquement si le réseau le permet).
 Mise à jour : relancer l'installeur d'une version plus récente. Désinstallation : `Installer.cmd -Uninstall`.
 Premier lancement après installation de BepInEx : une à deux minutes de plus (génération de l'interop).
 

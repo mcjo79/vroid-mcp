@@ -24,7 +24,7 @@ The installer:
 - registers the `vroid` server in Claude Code (`~/.claude.json`) and Claude Desktop, after backing up their
   configuration (`-NoClaude` to skip this).
 
-Requirements: Windows, Python 3.8+ available in PATH (numpy and Pillow recommended for thumbnails and texture work).
+Requirements: Windows 10/11. Python 3.12 is **bundled** in the release — nothing to install (numpy and Pillow are installed automatically when the network allows it).
 Update: run the installer of a newer release. Uninstall: `Installer.cmd -Uninstall`.
 First launch after installing BepInEx: one to two extra minutes (interop assemblies are generated).
 

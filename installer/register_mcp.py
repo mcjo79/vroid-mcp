@@ -5,11 +5,17 @@
 
 Fonctionne pour ~/.claude.json (Claude Code) et claude_desktop_config.json (Claude Desktop).
 Le fichier est sauvegardé (.bak-vroidmcp) avant modification ; le reste de son contenu est conservé.
+
+Le serveur est lancé avec -X utf8 -E -s : UTF-8 imposé, variables PYTHON* ignorées et site-packages
+utilisateur désactivé. Un Python installé à côté (même 3.12) ne peut donc pas contaminer le Python local.
 """
 import json
 import os
 import shutil
 import sys
+
+# Isolation du Python local : aucune dépendance à l'environnement de la machine.
+PYFLAGS = ["-X", "utf8", "-E", "-s"]
 
 
 def main():
@@ -33,7 +39,7 @@ def main():
             return
     else:
         python, server = args[1], args[2]
-        entry = {"command": python, "args": [server], "env": {}}
+        entry = {"command": python, "args": PYFLAGS + [server], "env": {}}
         if os.path.basename(path) == ".claude.json":
             entry = {"type": "stdio", **entry}
         servers["vroid"] = entry

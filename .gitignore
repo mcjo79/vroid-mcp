@@ -17,3 +17,9 @@ preset_cache/
 
 # Paquets de release
 dist/
+
+# Archive Python embarqué (téléchargée par build_release.py, jamais versionnée)
+installer/vendor/
+
+# Artefacts de session DSH
+.dsh/

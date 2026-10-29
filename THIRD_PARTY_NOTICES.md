@@ -37,3 +37,13 @@ SOFTWARE.
 VRoid Studio, BepInEx and their assets are not distributed with this project.
 VRoid Studio is a product of pixiv Inc.; BepInEx is a separate open-source
 project. Refer to their respective licenses before redistributing them.
+
+## Bundled Python
+
+Release packages from v0.12.0 ship a CPython 3.12 interpreter built by
+[python-build-standalone](https://github.com/astral-sh/python-build-standalone)
+(Astral Software), distributed under the Python Software Foundation License
+Version 2. The `LICENSE.txt` of that build is included in the package at
+`python/LICENSE.txt`. It is installed locally under
+`%LOCALAPPDATA%\VRoidMcp\python` and does not modify the system.
+

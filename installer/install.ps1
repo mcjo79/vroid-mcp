@@ -30,6 +30,10 @@ param(
 $ErrorActionPreference = "Stop"
 $Here = Split-Path -Parent $MyInvocation.MyCommand.Path
 
+# Isolation du Python local : UTF-8, variables PYTHON* ignorées, site-packages utilisateur désactivé.
+# Un Python 3.12 installé sur la machine ne peut donc pas influencer celui du paquet.
+$script:pyFlags = @("-X", "utf8", "-E", "-s")
+
 $BieVersion = "6.0.0-be.791"
 $BieUrl = "https://builds.bepinex.dev/projects/bepinex_be/791/BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.791%2Bb782da4.zip"
 $BieSha256 = "bb1c510909b69522733791f3a0817a487379a52da6468a492f1c9c19b3ec6f9a"
@@ -68,7 +72,7 @@ function Find-VRoid {
 function Invoke-Py {
     $prev = $ErrorActionPreference
     $ErrorActionPreference = "Continue"
-    try { & $script:python @args 2>&1 | ForEach-Object { "$_" } | Where-Object { $_ -notmatch "^\s*$" } | ForEach-Object { Write-Host "  $_" } }
+    try { & $script:python @script:pyFlags @args 2>&1 | ForEach-Object { "$_" } | Where-Object { $_ -notmatch "^\s*$" } | ForEach-Object { Write-Host "  $_" } }
     finally { $ErrorActionPreference = $prev }
     return $LASTEXITCODE
 }
@@ -100,6 +104,14 @@ function Find-Python {
         }
         return $first
     } finally { $ErrorActionPreference = $prev }
+}
+
+function Find-BundledPython {
+    # Python livré dans le paquet de release (python\python.exe). Prioritaire sur le Python système :
+    # c'est ce qui évite à l'utilisateur d'installer quoi que ce soit.
+    $p = Join-Path $Here "python\python.exe"
+    if (Test-Path $p) { return $p }
+    return $null
 }
 
 function Get-BieState($dir) {
@@ -182,7 +194,13 @@ if (Get-Process -Name "VRoidStudio" -ErrorAction SilentlyContinue) {
 }
 
 $pluginDir = Join-Path $GameDir "BepInEx\plugins\VRoidMcpBridge"
-$script:python = Find-Python
+$script:bundledPython = $false
+$script:python = Find-BundledPython
+if ($script:python) {
+    $script:bundledPython = $true
+} else {
+    $script:python = Find-Python
+}
 $python = $script:python
 
 if ($Uninstall) {
@@ -231,6 +249,25 @@ foreach ($f in @("README.md", "README-fr.md", "LICENSE", "THIRD_PARTY_NOTICES.md
     $p = Join-Path $Here $f
     if (Test-Path $p) { Copy-Item -Force $p $McpDir }
 }
+# Python embarqué : copié dans $McpDir pour survivre à la suppression du dossier de release.
+# Une mise à jour ne recopie que si la version livrée diffère de celle déjà en place.
+if ($script:bundledPython) {
+    $pySrc = Join-Path $Here "python"
+    $pyDst = Join-Path $McpDir "python"
+    $copyPy = $true
+    if (Test-Path (Join-Path $pyDst "python.exe")) {
+        $vSrc = (Get-Item (Join-Path $pySrc "python.exe")).VersionInfo.ProductVersion
+        $vDst = (Get-Item (Join-Path $pyDst "python.exe")).VersionInfo.ProductVersion
+        if ($vSrc -eq $vDst) { $copyPy = $false; Info "Python embarqué déjà en place ($vDst)." }
+    }
+    if ($copyPy) {
+        if (Test-Path $pyDst) { Remove-Item -Recurse -Force $pyDst }
+        Copy-Item -Recurse -Force $pySrc $pyDst
+        Info "Python embarqué installé dans $pyDst"
+    }
+    $script:python = Join-Path $pyDst "python.exe"
+    $python = $script:python
+}
 # Cache des presets : données locales, jamais fournies par la release. Un cache existant est conservé ;
 # sinon il se remplit à l'usage (vroid_preset_cache_sync / vroid_preset_cache_build).
 $cacheDst = Join-Path $McpDir "preset_cache"
@@ -253,11 +290,16 @@ if (-not $python) {
 } else {
     Info "Python : $python"
     $prev = $ErrorActionPreference; $ErrorActionPreference = "Continue"
-    & $python -c "import numpy, PIL" 2>&1 | Out-Null
+    & $python @script:pyFlags -c "import numpy, PIL" 2>&1 | Out-Null
     $hasLibs = ($LASTEXITCODE -eq 0); $ErrorActionPreference = $prev
     if (-not $hasLibs) {
-        Warn "numpy et Pillow manquent (vignettes et retouches de textures). Pour les installer :"
-        Warn "  `"$python`" -m pip install numpy pillow"
+        Info "Installation de numpy et Pillow (vignettes et textures)..."
+        $rcLyb = Invoke-Py -m pip install --quiet --disable-pip-version-check --no-warn-script-location numpy pillow
+        if ($rcLyb -eq 0) { Info "numpy et Pillow installés." }
+        else {
+            Warn "numpy et Pillow absents (vignettes et retouches de textures indisponibles). Pour les installer :"
+            Warn "  `"$python`" -m pip install numpy pillow"
+        }
     }
     if ($NoClaude) { Info "Déclaration dans Claude ignorée (-NoClaude)." }
     else { Register-Claude $python $server }
