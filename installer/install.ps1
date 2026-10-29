@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
   Installe ou met à jour le pont MCP pour VRoid Studio (plugin BepInEx + serveur MCP).
 
@@ -26,6 +26,9 @@ param(
     [switch]$NoClaude,
     [switch]$NoDsh,
     [switch]$Uninstall,
+    [switch]$RemoveBepInEx,
+    [switch]$RemoveData,
+    [switch]$FullCleanup,
     [string]$BepInExZip   # archive BepInEx locale (hors ligne), sinon téléchargée
 )
 
@@ -45,6 +48,11 @@ function Info($m) { Write-Host "  $m" }
 function Step($m) { Write-Host ""; Write-Host "== $m" -ForegroundColor Cyan }
 function Warn($m) { Write-Host "  ! $m" -ForegroundColor Yellow }
 function Fail($m) { Write-Host ""; Write-Host "ERREUR : $m" -ForegroundColor Red; exit 1 }
+
+$PluginSource = Join-Path $Here "plugin\VRoidMcpBridge.dll"
+if (-not (Test-Path $PluginSource)) {
+    Fail "Package incomplet : $PluginSource est introuvable.`nLancez Installer.cmd / Installer-GUI.cmd depuis le dossier décompressé de la release (VRoidMcp-v...), pas depuis le dossier installer du dépôt."
+}
 
 # ---------- VRoid Studio ----------
 function Find-VRoid {
@@ -168,6 +176,34 @@ function Backup-BepInEx($dir) {
     }
     Info "Ancienne installation déplacée dans : $bak"
     Info "(ses plugins ne sont pas recopiés : ceux de BepInEx 5 ne fonctionnent pas avec BepInEx 6 IL2CPP)"
+    return $bak
+}
+
+function Remove-BepInEx($dir) {
+    # Suppression explicite choisie par l'utilisateur : BepInEx courant + sauvegardes
+    # créées par les installations précédentes.
+    foreach ($f in $BieFiles) {
+        $p = Join-Path $dir $f
+        if (Test-Path $p) {
+            try {
+                Remove-Item -Recurse -Force $p -ErrorAction Stop
+                Info "Retiré : $p"
+            } catch {
+                Warn "Impossible de retirer $p : $($_.Exception.Message)"
+                $script:cleanupErrors++
+            }
+        }
+    }
+    Get-ChildItem -Path $dir -Directory -Filter "BepInEx_sauvegarde_*" -ErrorAction SilentlyContinue |
+        ForEach-Object {
+            try {
+                Remove-Item -Recurse -Force $_.FullName -ErrorAction Stop
+                Info "Sauvegarde retirée : $($_.FullName)"
+            } catch {
+                Warn "Impossible de retirer la sauvegarde $($_.FullName) : $($_.Exception.Message)"
+                $script:cleanupErrors++
+            }
+        }
 }
 
 # ---------- Claude ----------
@@ -217,13 +253,72 @@ $python = $script:python
 
 if ($Uninstall) {
     Step "Désinstallation"
-    if (Test-Path $pluginDir) { Remove-Item -Recurse -Force $pluginDir; Info "Plugin retiré." }
+    $script:cleanupErrors = 0
+    if ($FullCleanup) { $RemoveBepInEx = $true; $RemoveData = $true }
+    $statePath = Join-Path $McpDir "install-state.json"
+    $state = $null
+    if (Test-Path $statePath) {
+        try { $state = Get-Content -Raw -Path $statePath | ConvertFrom-Json }
+        catch { Warn "État d'installation illisible : $statePath" }
+    }
+    $bepInExOwned = $false
+    $bepInExBackup = $null
+    if ($state) {
+        if ($state.bepInExOwned) { $bepInExOwned = $true }
+        if ($state.bepInExBackup) { $bepInExBackup = [string]$state.bepInExBackup }
+    }
+
+    # Utiliser le Python embarqué avant de supprimer le dossier du serveur.
+    if (-not $python -and (Test-Path (Join-Path $McpDir "python\python.exe"))) {
+        $python = Join-Path $McpDir "python\python.exe"
+    }
     if ($python -and -not $NoClaude) { Register-Claude $python "" -Remove }
     if ($python -and -not $NoDsh) { Register-Dsh $python "" -Remove }
-    Info "BepInEx et $McpDir sont laissés en place (à supprimer à la main si souhaité)."
+    if (-not $python) { Warn "Python absent : les entrées Claude/DeepSeek Harness n'ont pas pu être retirées." }
+
+    if (Test-Path $pluginDir) {
+        try {
+            Remove-Item -Recurse -Force $pluginDir -ErrorAction Stop
+            Info "Plugin retiré : $pluginDir"
+        } catch {
+            Warn "Impossible de retirer le plugin : $($_.Exception.Message)"
+            $script:cleanupErrors++
+        }
+    }
+
+    if ($RemoveBepInEx) {
+        if (Test-Path (Join-Path $GameDir "BepInEx")) {
+            Warn "Suppression explicite de BepInEx et de ses sauvegardes."
+        }
+        Remove-BepInEx $GameDir
+    } else {
+        Info "BepInEx conservé (choix de désinstallation)."
+    }
+
+    if ($RemoveData) {
+        if (Test-Path $McpDir) {
+            try {
+                Remove-Item -Recurse -Force $McpDir -ErrorAction Stop
+                Info "Serveur, runtime et cache retirés : $McpDir"
+            } catch {
+                Warn "Impossible de retirer $McpDir : $($_.Exception.Message)"
+                $script:cleanupErrors++
+            }
+        }
+    } else {
+        Info "Serveur, runtime et cache conservés : $McpDir"
+    }
+
+    if ($script:cleanupErrors -gt 0) {
+        Warn "$script:cleanupErrors element(s) n'ont pas pu etre supprimes. Fermez VRoid/les fichiers ouverts puis relancez."
+        exit 2
+    }
+    Info "Nettoyage terminé."
     exit 0
 }
 
+$bepInExOwned = $false
+$bepInExBackup = $null
 Step "BepInEx"
 if ($SkipBepInEx) {
     Info "Étape ignorée (-SkipBepInEx)."
@@ -231,21 +326,38 @@ if ($SkipBepInEx) {
     $st = Get-BieState $GameDir
     switch ($st.State) {
         "ok" {
-            if ($ForceBepInEx) { Info "Réinstallation forcée."; Install-BepInEx $GameDir }
+            if ($ForceBepInEx) {
+                Info "Réinstallation forcée."
+                $bepInExBackup = Backup-BepInEx $GameDir
+                Install-BepInEx $GameDir
+                $bepInExOwned = $true
+            }
             else { Info "BepInEx $($st.Version) déjà installé : rien à faire." }
         }
         "other6" {
-            if ($ForceBepInEx) { Backup-BepInEx $GameDir; Install-BepInEx $GameDir }
+            if ($ForceBepInEx) {
+                $bepInExBackup = Backup-BepInEx $GameDir
+                Install-BepInEx $GameDir
+                $bepInExOwned = $true
+            }
             else { Warn "BepInEx 6 $($st.Version) présent (version testée : $BieVersion). Conservé ; -ForceBepInEx pour le remplacer." }
         }
-        "other" { Info "Version $($st.Version) trouvée : remplacement par BepInEx $BieVersion."; Backup-BepInEx $GameDir; Install-BepInEx $GameDir }
-        "none" { Install-BepInEx $GameDir }
+        "other" {
+            Info "Version $($st.Version) trouvée : remplacement par BepInEx $BieVersion."
+            $bepInExBackup = Backup-BepInEx $GameDir
+            Install-BepInEx $GameDir
+            $bepInExOwned = $true
+        }
+        "none" {
+            Install-BepInEx $GameDir
+            $bepInExOwned = $true
+        }
     }
 }
 
 Step "Plugin VRoidMcpBridge"
 New-Item -ItemType Directory -Force -Path $pluginDir | Out-Null
-Copy-Item -Force (Join-Path $Here "plugin\VRoidMcpBridge.dll") $pluginDir
+Copy-Item -Force $PluginSource $pluginDir
 $pv = (Get-Item (Join-Path $pluginDir "VRoidMcpBridge.dll")).VersionInfo.FileVersion
 Info "Installé dans $pluginDir"
 
@@ -297,6 +409,21 @@ if (Test-Path (Join-Path $cacheDst "catalog.json")) {
 $server = Join-Path $McpDir "mcp_server\vroid_mcp.py"
 Info "Serveur : $server"
 
+$installState = [ordered]@{
+    version = $pv
+    mcpDir = $McpDir
+    pluginDir = $pluginDir
+    bepInExOwned = $bepInExOwned
+    bepInExBackup = $bepInExBackup
+    installedAt = (Get-Date).ToString("o")
+}
+try {
+    $installState | ConvertTo-Json -Depth 4 | Set-Content -Path (Join-Path $McpDir "install-state.json") -Encoding UTF8
+    Info "État d'installation enregistré."
+} catch {
+    Warn "Impossible d'enregistrer l'état d'installation : $($_.Exception.Message)"
+}
+
 Step "Python et Claude"
 if (-not $python) {
     Warn "Python 3 introuvable : installez-le (https://www.python.org) puis relancez l'installation."
@@ -306,13 +433,10 @@ if (-not $python) {
     & $python @script:pyFlags -c "import numpy, PIL" 2>&1 | Out-Null
     $hasLibs = ($LASTEXITCODE -eq 0); $ErrorActionPreference = $prev
     if (-not $hasLibs) {
-        Info "Installation de numpy et Pillow (vignettes et textures)..."
-        $rcLyb = Invoke-Py -m pip install --quiet --disable-pip-version-check --no-warn-script-location numpy pillow
-        if ($rcLyb -eq 0) { Info "numpy et Pillow installés." }
-        else {
-            Warn "numpy et Pillow absents (vignettes et retouches de textures indisponibles). Pour les installer :"
-            Warn "  `"$python`" -m pip install numpy pillow"
-        }
+        Warn "numpy/Pillow absents du runtime embarqué : vignettes et retouches de textures indisponibles."
+        Warn "Le paquet devrait contenir python\Lib\site-packages\numpy et PIL ; vérifiez l'archive de release."
+    } else {
+        Info "numpy et Pillow disponibles."
     }
     if ($NoClaude) { Info "Déclaration dans Claude ignorée (-NoClaude)." }
     else { Register-Claude $python $server }

@@ -34,6 +34,22 @@ PBS_URL = (
 )
 PBS_SHA256 = "1f2ab53880fc67ea323398c6388e05af28addc99a8e389209f08a51fdff4b149"
 VENDOR = os.path.join(ROOT, "installer", "vendor")
+WHEEL_DIR = os.path.join(VENDOR, "wheels")
+
+# Roues Windows CPython 3.12 pour les fonctions image (vignettes, labels).
+# Elles sont extraites dans python/Lib/site-packages : aucun pip/réseau à l'installation.
+IMAGE_WHEELS = (
+    (
+        "numpy-2.5.4-cp312-cp312-win_amd64.whl",
+        "a7b1b6353e36a7e50de2973a38d705c88ee93adcf120673cee7f45a4a3fa223a",
+        "https://files.pythonhosted.org/packages/12/33/fefe62073dc8acfd0f2b9ed7c003af2f50aa61555e113e6db02b8f79f145/numpy-2.5.4-cp312-cp312-win_amd64.whl",
+    ),
+    (
+        "pillow-13.0.0-cp312-cp312-win_amd64.whl",
+        "ff3fe9eb621fbb9db4c4be33ab946f6bac5f98ab50ca8d3260503653656c961b",
+        "https://files.pythonhosted.org/packages/ff/cd/73a79ecdc822076002eb24b5e1e4a530b0bb5310fcb6d239abbec877110b/pillow-13.0.0-cp312-cp312-win_amd64.whl",
+    ),
+)
 
 # Retiré du paquet : inutile pour un serveur MCP headless (tkinter/tcl, en-têtes,
 # idle, ensurepip, cache de bytecode). ~60 Mo extraits -> ~35 Mo, ~10 Mo compressés.
@@ -84,6 +100,47 @@ def python_archive():
     return path
 
 
+def wheel_file(name, expected, url):
+    """Télécharge et vérifie une roue Windows, puis retourne son chemin."""
+    os.makedirs(WHEEL_DIR, exist_ok=True)
+    path = os.path.join(WHEEL_DIR, name)
+    if not os.path.exists(path):
+        print(f"téléchargement de {name}...")
+        tmp = path + ".part"
+        with urllib.request.urlopen(url, timeout=120) as r, open(tmp, "wb") as f:
+            while True:
+                chunk = r.read(1 << 20)
+                if not chunk:
+                    break
+                f.write(chunk)
+        os.replace(tmp, path)
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    if h.hexdigest() != expected:
+        raise SystemExit(f"empreinte invalide pour {name} : {h.hexdigest()}")
+    return path
+
+
+def add_image_wheels(z, arc):
+    """Extrait numpy/Pillow dans python/Lib/site-packages (offline à l'installation)."""
+    for name, expected, url in IMAGE_WHEELS:
+        path = wheel_file(name, expected, url)
+        with zipfile.ZipFile(path) as w:
+            for member in w.namelist():
+                if member.endswith("/") or member.endswith(".pyc") or "__pycache__" in member:
+                    continue
+                rel = member
+                if ".data/purelib/" in rel:
+                    rel = rel.split(".data/purelib/", 1)[1]
+                elif ".data/platlib/" in rel:
+                    rel = rel.split(".data/platlib/", 1)[1]
+                elif ".data/" in rel:
+                    continue
+                z.writestr(os.path.join(arc, "python", "Lib", "site-packages", rel), w.read(member))
+
+
 def add_python(z, arc):
     """Ajoute l'arbre python/ (python.exe, DLLs, Lib/...) au paquet."""
     with tarfile.open(python_archive(), "r:gz") as t:
@@ -113,9 +170,12 @@ def main(version, dll):
         for f in ("README.md", "README-fr.md", "README-ja.md", "README-zh.md", "LICENSE", "THIRD_PARTY_NOTICES.md"):
             z.write(os.path.join(ROOT, f), f"{base}/{f}")
         add_python(z, base)
+        add_image_wheels(z, base)
     names = zipfile.ZipFile(out).namelist()
     assert not any("preset_cache/" in n for n in names), "données de cache dans le paquet"
     assert f"{base}/python/python.exe" in names, "Python embarqué absent du paquet"
+    assert f"{base}/python/Lib/site-packages/numpy/__init__.py" in names, "numpy absent du paquet"
+    assert f"{base}/python/Lib/site-packages/PIL/__init__.py" in names, "Pillow absent du paquet"
     print(out, len(names), "fichiers", os.path.getsize(out) // 1024, "Ko")
 
 

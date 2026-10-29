@@ -195,7 +195,7 @@ function Set-Busy($busy) {
     if ($busy) { $statusLabel.Text = "Installation en cours..." } else { $statusLabel.Text = "Prêt." }
 }
 
-function Start-Install([bool]$uninstall) {
+function Start-Install([bool]$uninstall, [bool]$removeBepInEx = $false, [bool]$removeData = $false) {
     if (-not (Test-GameDir $rowGame.Box.Text)) {
         [System.Windows.Forms.MessageBox]::Show("Ce dossier ne contient pas VRoidStudio.exe.`n`nUtilisez 'Parcourir...' pour indiquer le dossier de VRoid Studio.", "Dossier invalide", "OK", "Warning") | Out-Null
         return
@@ -204,10 +204,21 @@ function Start-Install([bool]$uninstall) {
     $log.Clear()
     $script:read = 0
     $script:logFile = Join-Path $env:TEMP ("vroid_install_" + [guid]::NewGuid().ToString("N") + ".log")
+    try {
+        @(
+            "Commande : $InstallScript",
+            "VRoid : $($rowGame.Box.Text)",
+            "Donnees : $($rowMcp.Box.Text)",
+            "Date : $(Get-Date -Format o)",
+            ""
+        ) | Set-Content -Path $script:logFile -Encoding UTF8
+    } catch { }
 
     $argv = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $InstallScript,
               "-GameDir", $rowGame.Box.Text, "-McpDir", $rowMcp.Box.Text)
     if ($uninstall) { $argv += "-Uninstall" }
+    if ($removeBepInEx) { $argv += "-RemoveBepInEx" }
+    if ($removeData) { $argv += "-RemoveData" }
     if ($chkBepInEx.Checked) { $argv += "-ForceBepInEx" }
     if (-not $chkClaude.Checked) { $argv += "-NoClaude" }
     if (-not $chkDsh.Checked) { $argv += "-NoDsh" }
@@ -224,33 +235,46 @@ function Start-Install([bool]$uninstall) {
 
     $script:proc = New-Object System.Diagnostics.Process
     $script:proc.StartInfo = $psi
+    $script:outQueue = New-Object 'System.Collections.Concurrent.ConcurrentQueue[string]'
+    $script:proc.add_OutputDataReceived({ param($sender, $e) if ($null -ne $e.Data) { $script:outQueue.Enqueue($e.Data) } })
+    $script:proc.add_ErrorDataReceived({ param($sender, $e) if ($null -ne $e.Data) { $script:outQueue.Enqueue($e.Data) } })
     $script:proc.Start() | Out-Null
+    $script:proc.BeginOutputReadLine()
+    $script:proc.BeginErrorReadLine()
     Set-Busy $true
 }
 
-# lecture incrémentale de la sortie, sans bloquer l'interface
+function Flush-Output {
+    # Les handlers stdout/stderr remplissent une file thread-safe : le timer UI ne
+    # fait jamais de ReadLine bloquant, sinon la fenêtre passe en "Ne répond pas".
+    if ($script:outQueue -eq $null) { return }
+    $line = $null
+    while ($script:outQueue.TryDequeue([ref]$line)) {
+        if ($null -ne $line) {
+            $log.AppendText($line + "`r`n")
+            $log.ScrollToCaret()
+            try { Add-Content -Path $script:logFile -Value $line -Encoding UTF8 } catch { }
+        }
+    }
+}
+
 $timer = New-Object System.Windows.Forms.Timer
 $timer.Interval = 250
 $timer.Add_Tick({
     if ($script:proc -eq $null) { return }
-    while (-not $script:proc.StandardOutput.EndOfStream) {
-        $line = $script:proc.StandardOutput.ReadLine()
-        if ($line -ne $null) { $log.AppendText($line + "`r`n"); $log.ScrollToCaret() }
-    }
-    while (-not $script:proc.StandardError.EndOfStream) {
-        $line = $script:proc.StandardError.ReadLine()
-        if ($line -ne $null) { $log.AppendText($line + "`r`n"); $log.ScrollToCaret() }
-    }
+    Flush-Output
     if ($script:proc.HasExited) {
+        Flush-Output
         $code = $script:proc.ExitCode
         $timer.Stop()
         Set-Busy $false
         $script:proc = $null
         if ($code -eq 0) {
             $statusLabel.Text = "Termine."
-            [System.Windows.Forms.MessageBox]::Show("Installation terminee.`n`nRedemarrez Claude Code / DeepSeek Harness pour voir les outils vroid.", "VRoid", "OK", "Information") | Out-Null
+            [System.Windows.Forms.MessageBox]::Show("Installation terminee.`n`nJournal : $script:logFile`n`nRedemarrez Claude Code / DeepSeek Harness pour voir les outils vroid.", "VRoid", "OK", "Information") | Out-Null
         } else {
-            $statusLabel.Text = "Echec (code $code) - voir le journal."
+            $statusLabel.Text = "Echec (code $code) - journal conserve."
+            [System.Windows.Forms.MessageBox]::Show("Echec de l'operation (code $code).`n`nLe journal est conserve ici :`n$script:logFile`n`nLa fenetre reste ouverte.", "VRoid", "OK", "Error") | Out-Null
         }
     }
 })
@@ -258,8 +282,24 @@ $timer.Start()
 
 $btnInstall.Add_Click({ Start-Install $false })
 $btnUninstall.Add_Click({
-    $r = [System.Windows.Forms.MessageBox]::Show("Retirer le plugin de VRoid et les declarations dans les assistants ?`n`nBepInEx et le dossier du serveur sont conserves.", "Desinstaller", "YesNo", "Question")
-    if ($r -eq "Yes") { Start-Install $true }
+    $r = [System.Windows.Forms.MessageBox]::Show(
+        "Retirer le plugin de VRoid et les declarations dans les assistants ?",
+        "Desinstaller", "YesNo", "Question")
+    if ($r -ne "Yes") { return }
+
+    $rb = [System.Windows.Forms.MessageBox]::Show(
+        "Supprimer aussi BepInEx et ses sauvegardes ?`n`nAttention : BepInEx peut contenir d'autres plugins.`nChoisir Non conserve BepInEx.",
+        "BepInEx", "YesNoCancel", "Question",
+        [System.Windows.Forms.MessageBoxDefaultButton]::Button2)
+    if ($rb -eq "Cancel") { return }
+
+    $rd = [System.Windows.Forms.MessageBox]::Show(
+        "Supprimer aussi le serveur MCP, le runtime Python et le cache des presets ?`n`nChoisir Non conserve ces donnees locales.",
+        "Donnees locales", "YesNoCancel", "Question",
+        [System.Windows.Forms.MessageBoxDefaultButton]::Button2)
+    if ($rd -eq "Cancel") { return }
+
+    Start-Install $true ($rb -eq "Yes") ($rd -eq "Yes")
 })
 $btnClose.Add_Click({ $form.Close() })
 $form.Add_FormClosing({

@@ -47,3 +47,19 @@ Version 2. The `LICENSE.txt` of that build is included in the package at
 `python/LICENSE.txt`. It is installed locally under
 `%LOCALAPPDATA%\VRoidMcp\python` and does not modify the system.
 
+## Bundled image libraries
+
+The Windows release also bundles these wheels in
+`python\Lib\site-packages`, so thumbnails and texture analysis work offline:
+
+- **NumPy** 2.5.4 — BSD 3-Clause License, copyright the NumPy developers.
+  The license metadata is included in
+  `python\Lib\site-packages\numpy-2.5.4.dist-info\`.
+- **Pillow** 13.0.0 — Historical Permission Notice and Disclaimer (HPND),
+  copyright the Pillow contributors.
+  The license metadata is included in
+  `python\Lib\site-packages\pillow-13.0.0.dist-info\`.
+
+They are imported by the preset cache/labeler for thumbnails, color and visual
+metadata. They are not required for the core MCP editing or VRM export paths.
+
