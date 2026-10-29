@@ -63,3 +63,12 @@ The Windows release also bundles these wheels in
 They are imported by the preset cache/labeler for thumbnails, color and visual
 metadata. They are not required for the core MCP editing or VRM export paths.
 
+
+## Installer
+
+`VRoidMcp-Setup-v<version>.exe` is built with **NSIS** 3.11 (Nullsoft Scriptable
+Install System, <https://nsis.sourceforge.io>). The installer stub and plug-ins it
+embeds are released under the zlib/libpng license, copyright Nullsoft and
+contributors; parts use bzip2 and LZMA, under their own permissive licenses. See
+<https://nsis.sourceforge.io/License>. NSIS is used only to build the installer and
+is not installed on the user's machine.
