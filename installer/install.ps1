@@ -9,7 +9,8 @@
   3. Copie le plugin VRoidMcpBridge dans BepInEx\plugins.
   4. Copie le serveur MCP, le cache des presets, la documentation et les outils dans -McpDir
      (par défaut %LOCALAPPDATA%\VRoidMcp). Les annotations du cache déjà présentes sont conservées.
-  5. Déclare le serveur MCP "vroid" dans Claude Code et Claude Desktop (sauf -NoClaude), avec sauvegarde.
+  5. Déclare le serveur MCP "vroid" dans Claude Code et Claude Desktop (sauf -NoClaude), et
+     le connecteur dans DeepSeek Harness (sauf -NoDsh), avec sauvegarde.
 
 .EXAMPLE
   .\install.ps1
@@ -23,6 +24,7 @@ param(
     [switch]$ForceBepInEx,
     [switch]$SkipBepInEx,
     [switch]$NoClaude,
+    [switch]$NoDsh,
     [switch]$Uninstall,
     [string]$BepInExZip   # archive BepInEx locale (hors ligne), sinon téléchargée
 )
@@ -180,6 +182,16 @@ function Register-Claude($python, $server, [switch]$Remove) {
     }
 }
 
+function Register-Dsh($python, $server, [switch]$Remove) {
+    # Connecteur DeepSeek Harness : entrée @deepseek-ai/dsh-mcp-client dans le patch Cordis.
+    $reg = Join-Path $Here "register_dsh.py"
+    if (-not (Test-Path $reg)) { Warn "register_dsh.py absent du paquet."; return }
+    if ($Remove) { $rc = Invoke-Py $reg $python $server --remove }
+    else { $rc = Invoke-Py $reg $python $server }
+    if ($rc -eq 2) { Info "DeepSeek Harness non détecté : connecteur ignoré." }
+    elseif ($rc -ne 0) { Warn "échec de la déclaration dans DeepSeek Harness." }
+}
+
 # ================================================================
 Write-Host "Pont MCP pour VRoid Studio - installation" -ForegroundColor Green
 
@@ -207,6 +219,7 @@ if ($Uninstall) {
     Step "Désinstallation"
     if (Test-Path $pluginDir) { Remove-Item -Recurse -Force $pluginDir; Info "Plugin retiré." }
     if ($python -and -not $NoClaude) { Register-Claude $python "" -Remove }
+    if ($python -and -not $NoDsh) { Register-Dsh $python "" -Remove }
     Info "BepInEx et $McpDir sont laissés en place (à supprimer à la main si souhaité)."
     exit 0
 }
@@ -303,6 +316,8 @@ if (-not $python) {
     }
     if ($NoClaude) { Info "Déclaration dans Claude ignorée (-NoClaude)." }
     else { Register-Claude $python $server }
+    if ($NoDsh) { Info "Déclaration dans DeepSeek Harness ignorée (-NoDsh)." }
+    else { Register-Dsh $python $server }
 }
 
 Step "Terminé"

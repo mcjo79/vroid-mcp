@@ -11,7 +11,11 @@ IA ──MCP (stdio)──> mcp_server/vroid_mcp.py ──HTTP 127.0.0.1:7811─
 ## Installation (release)
 
 1. Télécharger `VRoidMcp-v<version>.zip` depuis les releases GitHub et le décompresser.
-2. Fermer VRoid Studio, puis double-cliquer sur `Installer.cmd`.
+2. Fermer VRoid Studio, puis double-cliquer sur **`Installer-GUI.cmd`**.
+
+L'installeur graphique propose le dossier de VRoid Studio (détection Steam, ou « Parcourir… » si
+elle échoue), le dossier du serveur, et les assistants à connecter. La version ligne de commande
+reste disponible (`Installer.cmd`), pour les scripts et l'installation silencieuse.
 
 L'installeur :
 - trouve VRoid Studio dans les bibliothèques Steam (sinon : `Installer.cmd -GameDir "<dossier de VRoid Studio>"`) ;
@@ -21,8 +25,11 @@ L'installeur :
 - copie le plugin dans `BepInEx\plugins\VRoidMcpBridge` ;
 - copie le serveur MCP, les outils, la documentation et la config de cadrage par défaut dans `%LOCALAPPDATA%\VRoidMcp`
   (cache des presets local et overrides de cadrage locaux, jamais écrasés) ;
-- déclare le serveur `vroid` dans Claude Code (`~/.claude.json`) et Claude Desktop, avec sauvegarde
-  (`-NoClaude` pour ne pas le faire).
+- déclare le serveur `vroid` dans **Claude Code** (`~/.claude.json`) et Claude Desktop, et pose le
+  **connecteur DeepSeek Harness** (`~/.dsh/profiles/<profil>/cordis.patch.yml`), avec sauvegarde
+  (`-NoClaude` / `-NoDsh` pour ne pas le faire).
+
+Le serveur MCP est le transport : l'utilisateur, lui, « connecte son assistant » à VRoid.
 
 Prérequis : Windows 10/11. Python 3.12 est **embarqué** dans le paquet — rien à installer (numpy et Pillow sont installés automatiquement si le réseau le permet).
 Mise à jour : relancer l'installeur d'une version plus récente. Désinstallation : `Installer.cmd -Uninstall`.

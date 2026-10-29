@@ -2,7 +2,8 @@
 
     python installer/build_release.py <version> <chemin de VRoidMcpBridge.dll compilé>
 
-Contenu : Installer.cmd, install.ps1, register_mcp.py, merge_cache.py, plugin/, mcp_server/ (sans cache),
+Contenu : Installer.cmd (CLI), Installer-GUI.cmd/.ps1 (graphique), install.ps1,
+register_mcp.py, register_dsh.py, merge_cache.py, plugin/, mcp_server/ (sans cache),
 tools/, docs/, config/ (defaults de cadrage), **python/ (CPython Windows embarqué)**, README*.md, LICENSE,
 THIRD_PARTY_NOTICES.md.
 
@@ -103,7 +104,8 @@ def main(version, dll):
     os.makedirs(os.path.dirname(out), exist_ok=True)
     base = f"VRoidMcp-v{version}"
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
-        for f in ("Installer.cmd", "install.ps1", "register_mcp.py", "merge_cache.py"):
+        for f in ("Installer.cmd", "Installer-GUI.cmd", "Installer-GUI.ps1", "install.ps1",
+                  "register_mcp.py", "register_dsh.py", "merge_cache.py"):
             z.write(os.path.join(ROOT, "installer", f), f"{base}/{f}")
         z.write(dll, f"{base}/plugin/VRoidMcpBridge.dll")
         for d in ("mcp_server", "tools", "docs", "config"):
