@@ -1,8 +1,12 @@
-"""Construit le paquet de release dist/VRoidMcp-v<version>.zip.
+"""Construit la release : dist/VRoidMcp-Setup-v<version>.exe (installeur NSIS) et dist/VRoidMcp-v<version>.zip.
 
-    python installer/build_release.py <version> <chemin de VRoidMcpBridge.dll compilé>
+    python installer/build_release.py <version> <chemin de VRoidMcpBridge.dll compilé> [--no-setup]
 
-Contenu : Installer.cmd (CLI), Installer-GUI.cmd/.ps1 (graphique), install.ps1,
+L'installeur NSIS (installer/nsis/VRoidMcp.nsi) embarque le contenu du zip et exécute install.ps1
+sans console. NSIS portable est téléchargé dans installer/vendor/ et vérifié par SHA-256
+(ou variable MAKENSIS / makensis dans le PATH).
+
+Contenu du zip : install.ps1,
 register_mcp.py, register_dsh.py, merge_cache.py, plugin/, mcp_server/ (sans cache),
 tools/, docs/, config/ (defaults de cadrage), **python/ (CPython Windows embarqué)**, README*.md, LICENSE,
 THIRD_PARTY_NOTICES.md.
@@ -16,6 +20,8 @@ Les données du cache des presets ne sont jamais incluses.
 """
 import hashlib
 import os
+import shutil
+import subprocess
 import sys
 import tarfile
 import urllib.request
@@ -161,8 +167,7 @@ def main(version, dll):
     os.makedirs(os.path.dirname(out), exist_ok=True)
     base = f"VRoidMcp-v{version}"
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
-        for f in ("Installer.cmd", "Installer-GUI.cmd", "Installer-GUI.ps1", "install.ps1",
-                  "register_mcp.py", "register_dsh.py", "merge_cache.py"):
+        for f in ("install.ps1", "register_mcp.py", "register_dsh.py", "merge_cache.py"):
             z.write(os.path.join(ROOT, "installer", f), f"{base}/{f}")
         z.write(dll, f"{base}/plugin/VRoidMcpBridge.dll")
         for d in ("mcp_server", "tools", "docs", "config"):
@@ -177,7 +182,66 @@ def main(version, dll):
     assert f"{base}/python/Lib/site-packages/numpy/__init__.py" in names, "numpy absent du paquet"
     assert f"{base}/python/Lib/site-packages/PIL/__init__.py" in names, "Pillow absent du paquet"
     print(out, len(names), "fichiers", os.path.getsize(out) // 1024, "Ko")
+    return out
+
+
+# --- Installeur NSIS ----------------------------------------------------------
+NSIS_VERSION = "3.11"
+NSIS_URL = f"https://downloads.sourceforge.net/project/nsis/NSIS%203/{NSIS_VERSION}/nsis-{NSIS_VERSION}.zip"
+NSIS_SHA256 = "c7d27f780ddb6cffb4730138cd1591e841f4b7edb155856901cdf5f214394fa1"
+
+
+def makensis():
+    """Chemin de makensis : MAKENSIS, PATH, sinon NSIS portable téléchargé dans installer/vendor."""
+    if os.environ.get("MAKENSIS"):
+        return os.environ["MAKENSIS"]
+    found = shutil.which("makensis")
+    if found:
+        return found
+    exe = os.path.join(VENDOR, "nsis", f"nsis-{NSIS_VERSION}", "makensis.exe")
+    if not os.path.exists(exe):
+        os.makedirs(VENDOR, exist_ok=True)
+        archive = os.path.join(VENDOR, f"nsis-{NSIS_VERSION}.zip")
+        if not os.path.exists(archive):
+            print(f"téléchargement de NSIS {NSIS_VERSION}...")
+            with urllib.request.urlopen(NSIS_URL, timeout=120) as r, open(archive + ".part", "wb") as f:
+                shutil.copyfileobj(r, f)
+            os.replace(archive + ".part", archive)
+        with open(archive, "rb") as f:
+            digest = hashlib.sha256(f.read()).hexdigest()
+        if digest != NSIS_SHA256:
+            raise SystemExit(f"empreinte NSIS invalide : {digest}")
+        with zipfile.ZipFile(archive) as z:
+            z.extractall(os.path.join(VENDOR, "nsis"))
+    return exe
+
+
+def build_setup(version, zip_path):
+    """Extrait le zip dans out/nsis_payload puis compile installer/nsis/VRoidMcp.nsi."""
+    payload_root = os.path.join(ROOT, "out", "nsis_payload")
+    shutil.rmtree(payload_root, ignore_errors=True)
+    with zipfile.ZipFile(zip_path) as z:
+        z.extractall(payload_root)
+    payload = os.path.join(payload_root, f"VRoidMcp-v{version}")
+    dist = os.path.join(ROOT, "dist")
+    nsi = os.path.join(ROOT, "installer", "nsis", "VRoidMcp.nsi")
+    numeric = version.split("-")[0]
+    # makensis (32 bits) projette son bloc compressé via des fichiers temporaires : un dossier dédié
+    # évite les échecs "error creating mmap" quand %TEMP% est restreint.
+    tmp = os.path.join(ROOT, "out", "nsis_tmp")
+    os.makedirs(tmp, exist_ok=True)
+    env = dict(os.environ, TMP=tmp, TEMP=tmp)
+    subprocess.run([makensis(), "/V2", "/INPUTCHARSET", "UTF8", f"/DVERSION={numeric}",
+                    f"/DPAYLOAD={payload}", f"/DOUTDIR={dist}", nsi], check=True, env=env)
+    shutil.rmtree(tmp, ignore_errors=True)
+    exe = os.path.join(dist, f"VRoidMcp-Setup-v{numeric}.exe")
+    print(exe, os.path.getsize(exe) // 1024, "Ko")
+    shutil.rmtree(payload_root, ignore_errors=True)
+    return exe
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2])
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    zip_path = main(args[0], args[1])
+    if "--no-setup" not in sys.argv:
+        build_setup(args[0], zip_path)

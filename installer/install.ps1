@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Installe ou met à jour le pont MCP pour VRoid Studio (plugin BepInEx + serveur MCP).
 
@@ -29,11 +29,14 @@ param(
     [switch]$RemoveBepInEx,
     [switch]$RemoveData,
     [switch]$FullCleanup,
-    [string]$BepInExZip   # archive BepInEx locale (hors ligne), sinon téléchargée
+    [string]$BepInExZip,  # archive BepInEx locale (hors ligne), sinon téléchargée
+    [switch]$FindGameDir, # affiche seulement le dossier de VRoid Studio trouvé (utilisé par setup.exe)
+    [string]$LogFile      # copie de toute la sortie dans ce fichier (utilisé par setup.exe)
 )
 
 $ErrorActionPreference = "Stop"
 $Here = Split-Path -Parent $MyInvocation.MyCommand.Path
+if ($LogFile) { try { Start-Transcript -Path $LogFile -Force | Out-Null } catch { } }
 
 # Isolation du Python local : UTF-8, variables PYTHON* ignorées, site-packages utilisateur désactivé.
 # Un Python 3.12 installé sur la machine ne peut donc pas influencer celui du paquet.
@@ -48,11 +51,6 @@ function Info($m) { Write-Host "  $m" }
 function Step($m) { Write-Host ""; Write-Host "== $m" -ForegroundColor Cyan }
 function Warn($m) { Write-Host "  ! $m" -ForegroundColor Yellow }
 function Fail($m) { Write-Host ""; Write-Host "ERREUR : $m" -ForegroundColor Red; exit 1 }
-
-$PluginSource = Join-Path $Here "plugin\VRoidMcpBridge.dll"
-if (-not (Test-Path $PluginSource)) {
-    Fail "Package incomplet : $PluginSource est introuvable.`nLancez Installer.cmd / Installer-GUI.cmd depuis le dossier décompressé de la release (VRoidMcp-v...), pas depuis le dossier installer du dépôt."
-}
 
 # ---------- VRoid Studio ----------
 function Find-VRoid {
@@ -78,12 +76,29 @@ function Find-VRoid {
     return $null
 }
 
+if ($FindGameDir) {
+    $found = Find-VRoid
+    if ($found) { Write-Output $found; exit 0 }
+    exit 1
+}
+
+$PluginSource = Join-Path $Here "plugin\VRoidMcpBridge.dll"
+if (-not (Test-Path $PluginSource)) {
+    Fail "Package incomplet : $PluginSource est introuvable.`nLancez VRoidMcp-Setup-v....exe, ou install.ps1 depuis le dossier décompressé de la release (VRoidMcp-v...), pas depuis le dossier installer du dépôt."
+}
+
 # Lance Python sans que sa sortie d'erreur interrompe le script (comportement de PowerShell 5.1).
 function Invoke-Py {
     $prev = $ErrorActionPreference
     $ErrorActionPreference = "Continue"
+    # Python écrit en UTF-8 (-X utf8) : le lire comme tel, sinon les accents arrivent abîmés.
+    $prevEnc = $null
+    try { $prevEnc = [Console]::OutputEncoding; [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false) } catch { }
     try { & $script:python @script:pyFlags @args 2>&1 | ForEach-Object { "$_" } | Where-Object { $_ -notmatch "^\s*$" } | ForEach-Object { Write-Host "  $_" } }
-    finally { $ErrorActionPreference = $prev }
+    finally {
+        $ErrorActionPreference = $prev
+        if ($prevEnc) { try { [Console]::OutputEncoding = $prevEnc } catch { } }
+    }
     return $LASTEXITCODE
 }
 
@@ -370,7 +385,7 @@ foreach ($d in @("mcp_server", "tools", "docs", "config")) {
         Copy-Item -Recurse -Force (Join-Path $src "*") (Join-Path $McpDir $d)
     }
 }
-foreach ($f in @("README.md", "README-fr.md", "LICENSE", "THIRD_PARTY_NOTICES.md")) {
+foreach ($f in @("README.md", "README-fr.md", "README-ja.md", "README-zh.md", "LICENSE", "THIRD_PARTY_NOTICES.md")) {
     $p = Join-Path $Here $f
     if (Test-Path $p) { Copy-Item -Force $p $McpDir }
 }

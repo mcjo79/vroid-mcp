@@ -585,11 +585,11 @@
           <ol class="install-steps" data-reveal>
             <li>
               <span class="step">1</span>
-              <div><h3>Download the release</h3><p>Get <code>VRoidMcp-v0.11.0.zip</code> from GitHub Releases and unzip it.</p></div>
+              <div><h3>Download the release</h3><p>Get <code>VRoidMcp-Setup-v&lt;version&gt;.exe</code> from GitHub Releases.</p></div>
             </li>
             <li>
               <span class="step">2</span>
-              <div><h3>Close VRoid, run the installer</h3><p>Double-click <code>Installer.cmd</code>. It finds VRoid through Steam, installs BepInEx if needed and copies the plugin.</p></div>
+              <div><h3>Close VRoid, run the installer</h3><p>Run the setup: a regular Windows installer, no administrator rights, no console. It finds VRoid through Steam, installs BepInEx if needed and copies the plugin.</p></div>
             </li>
             <li>
               <span class="step">3</span>
@@ -614,7 +614,7 @@
           <details class="info-block">
             <summary>What the installer does exactly</summary>
             <ul class="check-list">
-              <li>Finds VRoid in your Steam libraries (otherwise <code>Installer.cmd -GameDir "&lt;folder&gt;"</code>).</li>
+              <li>Finds VRoid in your Steam libraries (otherwise pick its folder with &laquo;&nbsp;Browse&hellip;&nbsp;&raquo;).</li>
               <li>Installs BepInEx 6.0.0-be.791 IL2CPP, verifies the SHA-256, and sets aside a previous version.</li>
               <li>Copies the plugin to <code>BepInEx\plugins\VRoidMcpBridge</code>.</li>
               <li>Copies the server, tools and documentation to <code>%LOCALAPPDATA%\VRoidMcp</code>.</li>

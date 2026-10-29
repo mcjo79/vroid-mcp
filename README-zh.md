@@ -14,11 +14,11 @@
 
 ## 安装
 
-1. 从 GitHub Releases 下载并解压 `VRoidMcp-v0.11.0.zip`。
-2. 关闭 VRoid Studio，运行 `Installer.cmd`。
+1. 从 GitHub Releases 下载 `VRoidMcp-Setup-v<version>.exe`。
+2. 关闭 VRoid Studio，运行安装程序（无需管理员权限，支持中文）。
 3. 重启 Claude Code / Claude Desktop，然后调用 `vroid_status`。
 
-安装器会配置 BepInEx 6、插件、MCP 服务器和默认文档。
+安装器会配置 BepInEx 6、插件、MCP 服务器和默认文档。可在 Windows“设置 → 应用”中卸载。安装失败时，日志位于 `%TEMP%\VRoidMcp-install.log`。
 
 ## 主要功能（52 个工具）
 

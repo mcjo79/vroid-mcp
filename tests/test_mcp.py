@@ -293,3 +293,42 @@ class FramingTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DeepSeekHarnessRegistrationTests(unittest.TestCase):
+    """installer/register_dsh.py must cover every Harness profile (web, desktop, ...)."""
+
+    def setUp(self):
+        sys.path.insert(0, os.path.join(ROOT, "installer"))
+        import register_dsh
+        self.reg = register_dsh
+        self.home = tempfile.mkdtemp()
+        os.environ["DSH_HOME"] = self.home
+        for name, patch in (("web", "- id: a\n  name: x\n"), ("desktop", None)):
+            d = os.path.join(self.home, "profiles", name)
+            os.makedirs(d)
+            with open(os.path.join(d, "package.json"), "w", encoding="utf-8") as fh:
+                fh.write('{"dsh": {"profile": {"bundles": []}}}')
+            if patch:
+                with open(os.path.join(d, "cordis.patch.yml"), "w", encoding="utf-8") as fh:
+                    fh.write(patch)
+        os.makedirs(os.path.join(self.home, "profiles", "node_modules"))
+
+    def tearDown(self):
+        os.environ.pop("DSH_HOME", None)
+
+    def read(self, profile):
+        with open(self.reg.patch_path(profile), encoding="utf-8") as fh:
+            return fh.read()
+
+    def test_all_profiles_registered_and_removed(self):
+        self.assertEqual(self.reg.all_profiles(), ["desktop", "web"])
+        for p in self.reg.all_profiles():
+            self.reg.update(p, "py.exe", "srv.py", remove=False)
+        for p in ("web", "desktop"):
+            self.assertEqual(self.read(p).count("id: mcp-vroid"), 1)
+        self.reg.update("web", "py.exe", "srv.py", remove=False)  # idempotent
+        self.assertEqual(self.read("web").count("id: mcp-vroid"), 1)
+        self.reg.update("web", "py.exe", "srv.py", remove=True)
+        self.assertNotIn("mcp-vroid", self.read("web"))
+        self.assertIn("- id: a", self.read("web"))

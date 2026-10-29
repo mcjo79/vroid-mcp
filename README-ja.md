@@ -14,11 +14,11 @@ Python はパッケージ内の `python\python.exe` が使われるため、PATH
 
 ## インストール
 
-1. GitHub Releases から `VRoidMcp-v0.11.0.zip` を取得して展開します。
-2. VRoid Studio を終了し、`Installer.cmd` を実行します。
+1. GitHub Releases から `VRoidMcp-Setup-v<version>.exe` を取得します。
+2. VRoid Studio を終了し、インストーラーを実行します（管理者権限不要、日本語対応）。
 3. Claude Code / Claude Desktop を再起動し、`vroid_status` を呼びます。
 
-インストーラーは BepInEx 6、プラグイン、MCP サーバー、既定のドキュメントを配置します。
+インストーラーは BepInEx 6、プラグイン、MCP サーバー、既定のドキュメントを配置します。アンインストールは Windows の「設定 → アプリ」から行えます。失敗した場合のログは `%TEMP%\VRoidMcp-install.log` にあります。
 
 ## 主な機能（52 ツール）
 

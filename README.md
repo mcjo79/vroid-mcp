@@ -10,29 +10,34 @@ AI ──MCP (stdio)──> mcp_server/vroid_mcp.py ──HTTP 127.0.0.1:7811─
 
 ## Installation (release)
 
-1. Download `VRoidMcp-v<version>.zip` from the GitHub releases and unzip it.
-2. Close VRoid Studio, then double-click **`Installer-GUI.cmd`**.
+1. Download **`VRoidMcp-Setup-v<version>.exe`** from the GitHub releases.
+2. Close VRoid Studio, then run it.
 
-The graphical installer lets you pick the VRoid Studio folder (Steam detection, or "Browse…" when it
-fails), the server folder, and which assistants to connect. The command-line installer is still
-available (`Installer.cmd`) for scripts and silent installs.
+A standard Windows installer (English, French, Japanese, Chinese) walks you through: options
+(Claude Code / Claude Desktop, DeepSeek Harness, reinstall BepInEx), the VRoid Studio folder (found in
+your Steam libraries, or "Browse…"), then the server folder. No administrator rights, no console window:
+progress and log are shown in the installer. It then appears in Windows' *Installed apps*, with an
+uninstaller and Start-menu shortcuts.
 
 The installer:
-- finds VRoid Studio in your Steam libraries (otherwise: `Installer.cmd -GameDir "<VRoid Studio folder>"`);
 - installs BepInEx 6.0.0-be.791 (IL2CPP) if it is missing, after moving any other version (BepInEx 5…) to
-  `BepInEx_sauvegarde_<date>`; an existing BepInEx 6 is kept (`-ForceBepInEx` to replace it).
+  `BepInEx_sauvegarde_<date>`; an existing BepInEx 6 is kept (option *Reinstall BepInEx* to replace it).
   The archive is downloaded from builds.bepinex.dev and its SHA-256 checksum is verified;
 - copies the plugin to `BepInEx\plugins\VRoidMcpBridge`;
-- copies the MCP server, tools, documentation and default framing config to `%LOCALAPPDATA%\VRoidMcp` (the local
-  preset cache and its framing overrides are never overwritten);
+- copies the MCP server, its bundled Python 3.12 (with numpy and Pillow), tools, documentation and default framing
+  config to `%LOCALAPPDATA%\VRoidMcp` (the local preset cache and its framing overrides are never overwritten);
 - registers the `vroid` server in **Claude Code** (`~/.claude.json`) and Claude Desktop, and installs the
-  **DeepSeek Harness connector** (`~/.dsh/profiles/<profile>/cordis.patch.yml`), after backing up their
-  configuration (`-NoClaude` / `-NoDsh` to skip this).
+  **DeepSeek Harness connector** in every Harness profile (`~/.dsh/profiles/web` and `desktop`, file `cordis.patch.yml`), after backing up their configuration.
 
 MCP is the transport: what users do is connect their assistant to VRoid.
 
-Requirements: Windows 10/11. Python 3.12 is **bundled** in the release — nothing to install (numpy and Pillow are installed automatically when the network allows it).
-Update: run the installer of a newer release. Uninstall: `Installer.cmd -Uninstall`.
+Requirements: Windows 10/11. Nothing else to install.
+Update: run the installer of a newer release. Uninstall: *Settings → Apps → VRoid MCP Bridge* (BepInEx and the
+preset cache are kept unless you tick them). If something fails, the full log is in `%TEMP%\VRoidMcp-install.log`.
+
+Scripted install: `VRoidMcp-Setup-v<version>.exe /S [/GAMEDIR=<VRoid Studio folder>] [/NOCLAUDE] [/NODSH] [/FORCEBEPINEX] [/D=<install folder>]`;
+uninstall: `Uninstall-VRoidMcp.exe /S [/REMOVEBEPINEX] [/REMOVECACHE]`. The release `.zip` also contains
+`install.ps1` for those who prefer PowerShell.
 First launch after installing BepInEx: one to two extra minutes (interop assemblies are generated).
 
 ## Components
