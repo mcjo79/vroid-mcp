@@ -8,6 +8,15 @@ Lets an AI (Claude Code, Claude Desktop…) read and edit the model open in VRoi
 AI ──MCP (stdio)──> mcp_server/vroid_mcp.py ──HTTP 127.0.0.1:7811──> BepInEx plugin (inside VRoid) ──> VRoidCore.Editing.Context
 ```
 
+## What's new in 0.13
+
+- **`vroid-studio` skill** for Claude Code and DeepSeek Harness: a one-page working guide, loaded only when the
+  conversation is about VRoid, installed in `~/.claude/skills` and `~/.dsh/skills`.
+- **MCP prompts** `start`, `character` and `export_vrm` (plus `help`): ready-made workflows, shown as
+  `/mcp__vroid__*` commands in Claude Code and in the **+** menu of Claude Desktop.
+- **Agent reference as MCP resources** `vroid://agent/...`: the English reference, one section at a time.
+- **"Using it with your assistant"** section below: what to do after installing, and what each client receives.
+
 ## What's new in 0.12
 
 - **Windows installer (NSIS)**: a standard four-language wizard replaces `Installer.cmd`; no administrator rights, no console, entry in *Installed apps* and an uninstaller.
@@ -48,6 +57,44 @@ uninstall: `Uninstall-VRoidMcp.exe /S [/REMOVEBEPINEX] [/REMOVECACHE]`. The rele
 `install.ps1` for those who prefer PowerShell.
 First launch after installing BepInEx: one to two extra minutes (interop assemblies are generated).
 
+## Using it with your assistant
+
+**Before installing**, quit Claude Desktop completely (tray icon → *Quit*): it rewrites its configuration
+when it quits, so an entry added while it is running can be lost. Close DeepSeek Harness too if you use it.
+
+**After installing**: start VRoid Studio, then restart Claude Code, Claude Desktop or DeepSeek Harness.
+Then just ask, in your own language:
+
+- *"Check that VRoid responds"* (`vroid_status`)
+- *"Open D:\models\konoha.vroid and give her pastel pink hair, then show me"*
+- *"Find a short pleated skirt in the presets and try three of them"*
+- *"Export the model as VRM 1.0 to D:\export\konoha.vrm with 2 materials"*
+
+Where the tools appear:
+
+| Client | Tools | Ready-made prompts |
+|---|---|---|
+| Claude Code (terminal or desktop app *Code* tab) | `vroid_*`, check with `/mcp` | `/mcp__vroid__start`, `/mcp__vroid__character`, `/mcp__vroid__export_vrm`, `/mcp__vroid__help` |
+| Claude Desktop (*Chat*) | tools menu of the conversation | the same prompts, from the **+** menu |
+| DeepSeek Harness (web and desktop) | `mcp__vroid__vroid_*` | — |
+
+**Working context given to the assistant** (nothing to configure):
+
+- **Server instructions** (MCP `initialize`): the short contract — check `vroid_status` first, one model at a
+  time, save before switching, never overwrite the user's file without asking.
+- **`vroid-studio` skill**, installed in `~/.claude/skills` (Claude Code) and `~/.dsh/skills` (DeepSeek Harness,
+  every profile): a one-page working guide loaded only when the conversation is about VRoid. Source:
+  [`agent/skills/vroid-studio/SKILL.md`](agent/skills/vroid-studio/SKILL.md).
+- **MCP resources** `vroid://agent/...`: the [agent reference](docs/AGENT_REFERENCE_EN.md), one section at a time
+  (face, hairstyle, body, outfit, presets, tools, workflows, troubleshooting…). In Claude Code, attach one with
+  `@vroid:vroid://agent/face`.
+- **MCP prompts** `start`, `character`, `export_vrm` and `help` (table above).
+- **`vroid_help`**: the built-in manual in four languages, available even when VRoid is closed.
+
+Claude Desktop's *Chat* tab does not read skill folders: it relies on the instructions, prompts and resources.
+To give it the guide too, upload `agent/skills/vroid-studio` as a skill (*Settings → Capabilities → Skills*) or
+paste `SKILL.md` into a project's instructions.
+
 ## Components
 
 | Item | Location |
@@ -56,6 +103,8 @@ First launch after installing BepInEx: one to two extra minutes (interop assembl
 | Plugin (source) | `VRoidMcpBridge/` → built into `BepInEx\plugins\VRoidMcpBridge` |
 | MCP server | `mcp_server/vroid_mcp.py` (bundled Python 3.12, numpy and Pillow) |
 | Framing defaults | `config/framing.json` (per category/body part; local overrides in the preset cache) |
+| Assistant skill | `agent/skills/vroid-studio/SKILL.md` → `~/.claude/skills` and `~/.dsh/skills` |
+| Agent reference | `docs/AGENT_REFERENCE_EN.md`, served as MCP resources `vroid://agent/...` |
 | Installer | `installer/` (NSIS script, `build_release.py` and the portable ZIP payload) |
 
 ## Building the plugin
@@ -74,7 +123,7 @@ The installer does this. Otherwise, in Claude Code:
 The installed copy already has its own runtime:
 
 ```
-claude mcp add vroid -- "%LOCALAPPDATA%\VRoidMcp\python\python.exe" "%LOCALAPPDATA%\VRoidMcp\mcp_server\vroid_mcp.py"
+claude mcp add --scope user vroid -- "%LOCALAPPDATA%\VRoidMcp\python\python.exe" -X utf8 -E -s "%LOCALAPPDATA%\VRoidMcp\mcp_server\vroid_mcp.py"
 ```
 
 Or in Claude Desktop (`claude_desktop_config.json`):
@@ -84,7 +133,7 @@ Or in Claude Desktop (`claude_desktop_config.json`):
   "mcpServers": {
     "vroid": {
       "command": "C:\\Users\\<you>\\AppData\\Local\\VRoidMcp\\python\\python.exe",
-      "args": ["C:\\Users\\<you>\\AppData\\Local\\VRoidMcp\\mcp_server\\vroid_mcp.py"]
+      "args": ["-X", "utf8", "-E", "-s", "C:\\Users\\<you>\\AppData\\Local\\VRoidMcp\\mcp_server\\vroid_mcp.py"]
     }
   }
 }

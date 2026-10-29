@@ -59,7 +59,9 @@ INITIALIZE_INSTRUCTIONS = (
     "An English Agent Reference is exposed as MCP resources: vroid://agent/reference (full), "
     "plus vroid://agent/start, face, hairstyle, body, outfit, accessories, look, physical, presets, "
     "tools, workflows and troubleshooting. Read only the section needed; tools/list stays the "
-    "authoritative schema list."
+    "authoritative schema list. MCP prompts: start (open a working session), character (build a "
+    "character from a description), export_vrm (full/balanced/light VRM export), help. "
+    "Reply in the user's language; never overwrite the user's .vroid file or discard changes without asking."
 )
 
 HELP = {

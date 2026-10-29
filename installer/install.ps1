@@ -243,6 +243,38 @@ function Register-Dsh($python, $server, [switch]$Remove) {
     elseif ($rc -ne 0) { Warn "échec de la déclaration dans DeepSeek Harness." }
 }
 
+# ---------- Skill vroid-studio (contexte de travail pour Claude Code et DeepSeek Harness) ----------
+# Un skill est chargé par l'assistant seulement quand la conversation parle de VRoid.
+# Claude Code : ~/.claude/skills ; DeepSeek Harness : ~/.dsh/skills (tous les profils).
+$SkillName = "vroid-studio"
+function Install-Skill($root, [switch]$Remove) {
+    $dst = Join-Path $root $SkillName
+    if ($Remove) {
+        $md = Join-Path $dst "SKILL.md"
+        if ((Test-Path $md) -and ((Get-Content -Raw $md) -match "(?m)^name:\s*$SkillName\s*$")) {
+            try { Remove-Item -Recurse -Force $dst -ErrorAction Stop; Info "Skill retiré : $dst" }
+            catch { Warn "Impossible de retirer le skill $dst : $($_.Exception.Message)"; $script:cleanupErrors++ }
+        }
+        return
+    }
+    $src = Join-Path $Here "agent\skills\$SkillName"
+    if (-not (Test-Path (Join-Path $src "SKILL.md"))) { Warn "Skill $SkillName absent du paquet."; return }
+    try {
+        New-Item -ItemType Directory -Force -Path $dst | Out-Null
+        Copy-Item -Recurse -Force (Join-Path $src "*") $dst -ErrorAction Stop
+        Info "Skill $SkillName installé : $dst"
+    } catch { Warn "Impossible d'installer le skill dans $dst : $($_.Exception.Message)" }
+}
+function Get-SkillRoots([switch]$Claude, [switch]$Dsh) {
+    $roots = @()
+    if ($Claude) { $roots += (Join-Path $env:USERPROFILE ".claude\skills") }
+    if ($Dsh) {
+        $dshHome = if ($env:DSH_HOME) { $env:DSH_HOME } else { Join-Path $env:USERPROFILE ".dsh" }
+        if (Test-Path (Join-Path $dshHome "profiles")) { $roots += (Join-Path $dshHome "skills") }
+    }
+    return $roots
+}
+
 # ================================================================
 Write-Host "Pont MCP pour VRoid Studio - installation" -ForegroundColor Green
 
@@ -289,6 +321,7 @@ if ($Uninstall) {
     }
     if ($python -and -not $NoClaude) { Register-Claude $python "" -Remove }
     if ($python -and -not $NoDsh) { Register-Dsh $python "" -Remove }
+    foreach ($r in (Get-SkillRoots -Claude:(-not $NoClaude) -Dsh:(-not $NoDsh))) { Install-Skill $r -Remove }
     if (-not $python) { Warn "Python absent : les entrées Claude/DeepSeek Harness n'ont pas pu être retirées." }
 
     if (Test-Path $pluginDir) {
@@ -458,6 +491,10 @@ if (-not $python) {
     if ($NoDsh) { Info "Déclaration dans DeepSeek Harness ignorée (-NoDsh)." }
     else { Register-Dsh $python $server }
 }
+Step "Skill pour les assistants"
+$skillRoots = Get-SkillRoots -Claude:(-not $NoClaude) -Dsh:(-not $NoDsh)
+if (-not $skillRoots) { Info "Aucun assistant sélectionné : skill non installé." }
+foreach ($r in $skillRoots) { Install-Skill $r }
 
 Step "Terminé"
 Info "Plugin $pv installé. Au premier lancement après une installation de BepInEx, VRoid Studio met"

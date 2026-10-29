@@ -35,6 +35,12 @@ VRoidMcp-Setup-v<version>.exe /S /GAMEDIR="<VRoid Studio 文件夹>" /NOCLAUDE /
 Uninstall-VRoidMcp.exe /S /REMOVEBEPINEX /REMOVECACHE
 ```
 
+## 0.13 新功能
+
+- 面向 Claude Code 和 DeepSeek Harness 的 `vroid-studio` 技能（仅在谈到 VRoid 时加载的工作指南）。
+- MCP 提示词 `start`、`character`、`export_vrm`（在 Claude Code 中为 `/mcp__vroid__*` 命令）。
+- 英文智能体参考以 MCP 资源 `vroid://agent/...` 按章节提供。
+
 ## 0.12 新功能
 
 - **Windows 安装器（NSIS）**：用四语言标准向导替代 `Installer.cmd`，无需管理员权限，也没有控制台窗口。
@@ -42,6 +48,12 @@ Uninstall-VRoidMcp.exe /S /REMOVEBEPINEX /REMOVECACHE
 - **DeepSeek Harness 连接器**：在 Web / Desktop 的所有配置文件中注册 `vroid` 服务器。
 - **VRoid Studio 2.16 / Unity 6 稳定性**：首次加载编辑器时最多等待 120 秒。
 - **预设缓存保护**：当 VRoid 处于模型选择界面或无法读取自定义项目时，不再把现有缓存标记为已删除。
+
+## 在助手中使用
+
+安装前请完全退出 Claude Desktop（托盘图标 → 退出）：它退出时会重写配置，运行期间添加的条目可能丢失。
+安装后，启动 VRoid Studio，再重启 Claude Code / Claude Desktop / DeepSeek Harness，然后直接用中文提出请求，例如“检查 VRoid 是否响应”。
+助手会自动获得：服务器说明、`vroid-studio` 技能（`~/.claude/skills` 和 `~/.dsh/skills`）、MCP 资源 `vroid://agent/...`，以及提示词 `start`、`character`、`export_vrm`、`help`。
 
 ## 主要功能（52 个工具）
 

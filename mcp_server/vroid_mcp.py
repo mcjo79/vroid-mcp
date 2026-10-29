@@ -18,6 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import preset_cache  # noqa: E402
 import help_i18n  # noqa: E402
 import tool_i18n  # noqa: E402
+import prompts  # noqa: E402
 
 BRIDGE = os.environ.get("VROID_BRIDGE_URL", "http://127.0.0.1:7811")
 PROTOCOL_VERSION = "2025-06-18"
@@ -83,7 +84,8 @@ def _agent_heading_blocks(text):
     blocks = {}
     for part in re.split(r"(?m)^## ", text)[1:]:
         title, _, body = part.partition("\n")
-        blocks[title.strip()] = "## " + part
+        # The generator may number its headings ("## 2. Start and lifecycle"): match without the number.
+        blocks[re.sub(r"^\d+\.\s*", "", title.strip())] = "## " + part
     return blocks
 
 
@@ -1735,7 +1737,7 @@ def handle(msg):
         return {
             "protocolVersion": params.get("protocolVersion", PROTOCOL_VERSION),
             "capabilities": {"tools": {}, "prompts": {}, "resources": {}},
-            "serverInfo": {"name": "vroid-studio", "version": "0.12.0"},
+            "serverInfo": {"name": "vroid-studio", "version": "0.13.0"},
             "instructions": help_i18n.INITIALIZE_INSTRUCTIONS,
         }
     if method == "ping":
@@ -1747,26 +1749,9 @@ def handle(msg):
     if method == "resources/read":
         return read_agent_resource(params.get("uri"))
     if method == "prompts/list":
-        return {"prompts": [{
-            "name": "help",
-            "description": "VRoid Studio MCP manual (English, French, Japanese, Simplified Chinese)",
-            "arguments": [
-                {"name": "topic", "description": "overview, tools, lifecycle, export, framing, thumbnails, colors, "
-                                                 "outfit, sessions, errors, languages, batch", "required": False},
-                {"name": "lang", "description": "en (default), fr, ja, zh-CN", "required": False},
-            ],
-        }]}
+        return {"prompts": prompts.PROMPTS}
     if method == "prompts/get":
-        if params.get("name") != "help":
-            raise KeyError(params.get("name"))
-        a = params.get("arguments") or {}
-        return {
-            "description": "VRoid Studio MCP help",
-            "messages": [{"role": "user", "content": {
-                "type": "text",
-                "text": help_i18n.help_text(a.get("topic", "overview"), a.get("lang", "en"), TOOLS),
-            }}],
-        }
+        return prompts.get(params.get("name"), params.get("arguments"), TOOLS)
     if method == "tools/call":
         try:
             name = params["name"]

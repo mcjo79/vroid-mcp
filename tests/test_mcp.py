@@ -358,3 +358,44 @@ class DeepSeekHarnessRegistrationTests(unittest.TestCase):
         self.reg.update("web", "py.exe", "srv.py", remove=True)
         self.assertNotIn("mcp-vroid", self.read("web"))
         self.assertIn("- id: a", self.read("web"))
+
+
+class PromptAndSkillTests(unittest.TestCase):
+    """MCP prompts and the vroid-studio skill give clients a working context."""
+
+    def test_prompts_listed_and_rendered(self):
+        names = [p["name"] for p in vroid_mcp.handle({"method": "prompts/list"})["prompts"]]
+        self.assertEqual(names, ["help", "start", "character", "export_vrm"])
+        start = vroid_mcp.handle({"method": "prompts/get", "params": {"name": "start", "arguments": {"goal": "x"}}})
+        self.assertIn("vroid_status", start["messages"][0]["content"]["text"])
+        exp = vroid_mcp.handle({"method": "prompts/get", "params": {
+            "name": "export_vrm", "arguments": {"path": "D:/o.vrm", "preset": "light"}}})
+        self.assertIn("material_mode=1", exp["messages"][0]["content"]["text"])
+        with self.assertRaises(ValueError):
+            vroid_mcp.handle({"method": "prompts/get", "params": {"name": "character", "arguments": {}}})
+
+    def test_skill_is_valid_and_mentions_real_tools(self):
+        path = os.path.join(ROOT, "agent", "skills", "vroid-studio", "SKILL.md")
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
+        self.assertTrue(text.startswith("---\n"))
+        front = text.split("---\n", 2)[1]
+        meta = dict(line.split(":", 1) for line in front.strip().splitlines())
+        self.assertEqual(meta["name"].strip(), "vroid-studio")
+        self.assertRegex(meta["name"].strip(), r"^[a-z0-9]+(-[a-z0-9]+)*$")
+        self.assertLessEqual(len(meta["description"].strip()), 1024)
+        known = {t["name"] for t in vroid_mcp.TOOLS}
+        used = set(re.findall(r"\bvroid_[a-z_]+[a-z]", text))
+        self.assertEqual(sorted(used - known), [])
+
+
+class AgentReferenceHeadingTests(unittest.TestCase):
+    def test_numbered_headings_still_match_resources(self):
+        blocks = vroid_mcp._agent_heading_blocks("# T\n\n## 2. Start and lifecycle\nbody\n## Face parameters\nx\n")
+        self.assertIn("Start and lifecycle", blocks)
+        self.assertIn("Face parameters", blocks)
+
+    def test_every_resource_section_exists_in_installed_reference(self):
+        for slug, _, _, headings in vroid_mcp.AGENT_RESOURCE_GROUPS:
+            text = vroid_mcp.read_agent_resource("vroid://agent/" + slug)["contents"][0]["text"]
+            self.assertNotIn("not present in the installed reference", text, slug)

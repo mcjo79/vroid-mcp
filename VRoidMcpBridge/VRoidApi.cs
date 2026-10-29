@@ -61,7 +61,7 @@ public static class VRoidApi
         var file = FileLifecycle.Info();
         return new
         {
-            plugin = "VRoidMcpBridge 0.12.0",
+            plugin = "VRoidMcpBridge 0.13.0",
             startedUtc = Started.ToString("o"),   // change à chaque lancement de VRoid : sert à déclencher le scan du cache
             unity = Application.unityVersion,
             modelOpen = file.modelOpen,

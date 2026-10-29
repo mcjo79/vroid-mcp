@@ -1,6 +1,6 @@
 # VRoid MCP Bridge — Agent Reference (English)
 
-Version 0.12.0 · generated from the live MCP tool registry and a model-open N00 session.
+Version 0.13.0 · generated from the live MCP tool registry and a model-open N00 session.
 
 Audience: an AI agent using the **`vroid`** MCP server through DeepSeek Harness (or any MCP client). It assumes no access to the VRoid Studio or VRoid MCP source code. The server, plugin, Python runtime and client integration are already installed.
 
@@ -12,7 +12,7 @@ Audience: an AI agent using the **`vroid`** MCP server through DeepSeek Harness 
 - **Preset cache tools** can search without VRoid; `vroid_preset_cache_*` does not require an open model.
 - The HTTP bridge listens on `127.0.0.1:7811`; the MCP server runs over stdio.
 
-The same reference is exposed as MCP **resources**, so an agent can load one section without injecting the whole file: `vroid://agent/reference` (full), `vroid://agent/start`, `face`, `hairstyle`, `body`, `outfit`, `accessories`, `look`, `physical`, `presets`, `tools`, `workflows`, `troubleshooting`. `initialize.instructions` carries the short contract and the resource list; `tools/list` remains the authoritative JSON-schema source.
+The same reference is exposed as MCP **resources**, so an agent can load one section without injecting the whole file: `vroid://agent/reference` (full), `vroid://agent/start`, `face`, `hairstyle`, `body`, `outfit`, `accessories`, `look`, `physical`, `presets`, `tools`, `workflows`, `troubleshooting`. `initialize.instructions` carries the short contract and the resource list; `tools/list` remains the authoritative JSON-schema source. MCP prompts `start`, `character`, `export_vrm` and `help` open ready-made workflows, and the installer adds a `vroid-studio` skill (one-page working guide) for Claude Code (`~/.claude/skills`) and DeepSeek Harness (`~/.dsh/skills`).
 
 ## Start and lifecycle
 
@@ -1355,4 +1355,4 @@ vroid_face_preview(name='', weight=0)      # reset
 python tools/gen_agent_reference_en.py
 ```
 
-_Generated 2026-10-30 from VRoid MCP Bridge 0.12.0._
+_Generated 2026-10-30 from VRoid MCP Bridge 0.13.0._

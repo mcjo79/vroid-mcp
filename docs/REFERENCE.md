@@ -1,6 +1,6 @@
 # Référence du pont MCP VRoid
 
-Mise à jour manuelle du 2026-10-29 pour VRoidMcpBridge 0.12.0 (Unity 6000.0.62f1) ;
+Mise à jour manuelle du 2026-10-30 pour VRoidMcpBridge 0.13.0 (Unity 6000.0.62f1) ;
 à régénérer avec `tools/gen_reference.py` VRoid ouvert.
 
 Voir aussi `docs/TEXTURES.md` pour l'édition des textures et de leurs calques.

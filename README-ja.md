@@ -35,6 +35,12 @@ VRoidMcp-Setup-v<version>.exe /S /GAMEDIR="<VRoid Studio フォルダー>" /NOCL
 Uninstall-VRoidMcp.exe /S /REMOVEBEPINEX /REMOVECACHE
 ```
 
+## 0.13 の新機能
+
+- Claude Code と DeepSeek Harness 向けの `vroid-studio` スキル（VRoid の話題のときだけ読み込まれる作業ガイド）。
+- MCP プロンプト `start`・`character`・`export_vrm`（Claude Code では `/mcp__vroid__*` コマンド）。
+- 英語のエージェントリファレンスを MCP リソース `vroid://agent/...` としてセクション単位で提供。
+
 ## 0.12 の新機能
 
 - **Windows インストーラー（NSIS）**: `Installer.cmd` の代わりに、4 言語の標準ウィザード。管理者権限もコンソールも不要です。
@@ -42,6 +48,12 @@ Uninstall-VRoidMcp.exe /S /REMOVEBEPINEX /REMOVECACHE
 - **DeepSeek Harness コネクター**: Web / Desktop のすべてのプロファイルに `vroid` サーバーを登録します。
 - **VRoid Studio 2.16 / Unity 6 の安定性**: セッション最初のエディター読み込みを最大 120 秒待機します。
 - **プリセットキャッシュ保護**: VRoid がモデル選択画面にあるときやカスタム項目を読めないときに、既存のキャッシュを「削除済み」にしません。
+
+## アシスタントでの使い方
+
+インストール前に Claude Desktop を完全に終了してください（タスクトレイ → 終了）。起動中に追加した設定は終了時に上書きされることがあります。
+インストール後、VRoid Studio を起動し、Claude Code / Claude Desktop / DeepSeek Harness を再起動して、「VRoid が応答するか確認して」のように日本語で依頼します。
+アシスタントには、サーバーの指示、`vroid-studio` スキル（`~/.claude/skills` と `~/.dsh/skills`）、MCP リソース `vroid://agent/...`、プロンプト（`start`・`character`・`export_vrm`・`help`）が自動で提供されます。
 
 ## 主な機能（52 ツール）
 

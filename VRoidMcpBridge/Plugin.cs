@@ -12,7 +12,7 @@ using VRoid.Studio.Component;
 
 namespace VRoidMcpBridge;
 
-[BepInPlugin(Guid, "VRoid MCP Bridge", "0.12.0")]
+[BepInPlugin(Guid, "VRoid MCP Bridge", "0.13.0")]
 public class Plugin : BasePlugin
 {
     public const string Guid = "dev.vroid.mcpbridge";
