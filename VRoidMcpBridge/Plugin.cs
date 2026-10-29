@@ -61,7 +61,15 @@ public class MainThread : MonoBehaviour
     public static DateTime LastPumpUtc { get; private set; }
     public static string LastPumpSource { get; private set; } = "none";
     public static int Pending => Queue.Count;
-    static readonly TimeSpan Timeout = TimeSpan.FromSeconds(10);
+    // Le premier chargement de l'éditeur (shaders, interop) peut dépasser largement 10 s,
+    // surtout dans une VM. Tant que l'éditeur n'a pas été chargé une fois dans la session,
+    // on laisse beaucoup plus de marge pour ne pas laisser l'appel en échec au milieu
+    // d'une transition d'écran (c'est ce qui figeait VRoid au premier vroid_create).
+    static readonly TimeSpan WarmTimeout = TimeSpan.FromSeconds(10);
+    static readonly TimeSpan ColdTimeout = TimeSpan.FromSeconds(120);
+    /// <summary>Vrai dès qu'un modèle a été ouvert une première fois dans cette session.</summary>
+    public static bool EditorWarm { get; set; }
+    static TimeSpan Timeout => EditorWarm ? WarmTimeout : ColdTimeout;
 
     public MainThread(IntPtr ptr) : base(ptr) { }
 

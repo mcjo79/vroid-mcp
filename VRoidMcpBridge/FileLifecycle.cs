@@ -103,12 +103,24 @@ public static class FileLifecycle
 
     static async Task WaitModelReady(int timeoutSeconds = 45)
     {
-        if (await WaitUntil(() => VRoidApi.IsContextReady() && !_updating, timeoutSeconds))
+        for (var attempt = 1; ; attempt++)
         {
-            await Task.Delay(600);
-            if (await WaitUntil(() => VRoidApi.IsContextReady(), 5)) return;
+            if (await WaitUntil(() => VRoidApi.IsContextReady() && !_updating, timeoutSeconds))
+            {
+                await Task.Delay(600);
+                if (await WaitUntil(() => VRoidApi.IsContextReady(), 5))
+                {
+                    // À partir d'ici les chargements suivants sont rapides : on peut revenir
+                    // au délai normal du thread principal.
+                    MainThread.EditorWarm = true;
+                    return;
+                }
+            }
+            if (attempt >= 2) break;
+            // Démarrage à froid : le premier chargement de l'éditeur peut être très long.
+            await Task.Delay(3000);
         }
-        throw new TimeoutException("The model is not ready after " + timeoutSeconds + " seconds.");
+        throw new TimeoutException("The model is not ready after " + (timeoutSeconds * 2) + " seconds.");
     }
 
     public static async Task<object> Create(string gender)
