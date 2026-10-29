@@ -66,6 +66,30 @@ class CatalogScanTests(unittest.TestCase):
         self.assertIn("skipped", res)
         self.assertEqual(res["removed"], [])
 
+    def test_unreadable_customs_are_not_marked_removed(self):
+        """Une lecture d'/custom_items en échec ne doit pas retirer les assets du cache."""
+        import unittest.mock as mock
+
+        def fake_bridge(path, **kwargs):
+            if path == "/presets":
+                return {"presets": [{"resource": "pixiv/x/N00/Base_000/a.transferablegroup", "id": "p1"}]}
+            if path == "/status":
+                return {"modelOpen": True, "ready": True, "unity": "6000.0.62f1", "startedUtc": "s1"}
+            raise RuntimeError("bridge injoignable")
+
+        cached = {"presets": {"custom:res#fichier.vroid": {
+            "kind": "custom", "removed": False, "name": "Mon objet", "removedSince": None}}}
+        with mock.patch.object(vroid_mcp, "call_bridge", side_effect=fake_bridge), \
+             mock.patch.object(preset_cache, "load", side_effect=lambda: cached), \
+             mock.patch.object(preset_cache, "_save", lambda cat: cached.update(cat)), \
+             mock.patch.object(preset_cache, "now", lambda: "2026-01-01T00:00:00Z"), \
+             mock.patch.object(preset_cache, "category_of", lambda k: ("", "")), \
+             mock.patch.object(preset_cache, "slot_of", lambda k: ""):
+            vroid_mcp.cache_sync()
+
+        self.assertFalse(cached["presets"]["custom:res#fichier.vroid"]["removed"],
+                         "l'objet personnalisé doit rester présent")
+
     def test_maybe_scan_ignores_closed_model(self):
         import unittest.mock as mock
         st = {"modelOpen": False, "ready": False, "startedUtc": "sess-1"}

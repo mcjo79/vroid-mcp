@@ -624,10 +624,13 @@ def cache_sync(icons=False, icon_limit=None):
     """Scan de ce que VRoid propose (presets intégrés + objets personnalisés) et mise à jour du cache."""
     live = call_bridge("/presets", query={"limit": 100000, "include_locked": "true"})
     st = call_bridge("/status")
+    customs_known = True
     try:
-        customs = call_bridge("/custom_items").get("items", [])
-    except Exception:  # plugin antérieur à 0.11
-        customs = []
+        customs = call_bridge("/custom_items").get("items")
+        if customs is None:
+            customs, customs_known = [], False
+    except Exception:  # plugin antérieur à 0.11, ou lecture impossible
+        customs, customs_known = [], False
     items = live.get("presets") if isinstance(live, dict) else None
     if items is None and isinstance(live, dict):
         items = live.get("items") or live.get("all")
@@ -635,7 +638,8 @@ def cache_sync(icons=False, icon_limit=None):
         # Ne jamais scanner une liste vide : cela marquerait tout le cache comme retiré.
         return {"total": 0, "customs": 0, "new": 0, "changed": [], "removed": [],
                 "skipped": "aucun preset renvoyé par VRoid (modèle non ouvert ?)"}
-    res = preset_cache.scan(items, customs, st.get("unity"), st.get("startedUtc"))
+    res = preset_cache.scan(items, customs, st.get("unity"), st.get("startedUtc"),
+                            customs_known=customs_known)
     if icons:
         done = 0
         for e in list(preset_cache.load()["presets"].values()):

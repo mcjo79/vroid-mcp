@@ -359,7 +359,7 @@ def _new_entry(key, **kw):
     return e
 
 
-def scan(presets, customs=None, unity_version=None, session=None):
+def scan(presets, customs=None, unity_version=None, session=None, customs_known=True):
     """Compare ce que VRoid propose maintenant (presets intégrés + objets personnalisés) avec le cache.
 
     - nouveau  : entrée créée (status "new") ;
@@ -367,6 +367,9 @@ def scan(presets, customs=None, unity_version=None, session=None):
     - retiré   : absent de VRoid (removed=true, annotations conservées ; réapparaît tel quel s'il revient).
     Les noms des objets personnalisés sont relus à chaque scan (ce sont ceux de l'utilisateur dans VRoid).
     Les presets intégrés n'ont pas de nom dans VRoid : leur description vient des annotations.
+
+    customs_known=False signifie « la liste des objets personnalisés n'a pas pu être lue » :
+    les objets déjà en cache sont alors laissés intacts au lieu d'être marqués retirés.
     """
     with _Lock():
         cat = load()
@@ -413,6 +416,9 @@ def scan(presets, customs=None, unity_version=None, session=None):
         removed = []
         for key, e in cat["presets"].items():
             if key not in seen and not e.get("removed"):
+                if e.get("kind") == "custom" and not customs_known:
+                    # Liste illisible : ne pas conclure que l'objet a disparu.
+                    continue
                 e["removed"] = True
                 e["removedSince"] = now()
                 removed.append(key)
