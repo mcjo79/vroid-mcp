@@ -102,6 +102,12 @@ python tools/gen_reference.py
 
 The reference and `docs/TEXTURES.md` are written in French. Documentation is also available in Japanese and Simplified Chinese (see the language links at the top).
 
+For an AI agent using the server through MCP (including DeepSeek Harness), see
+[`docs/AGENT_REFERENCE_EN.md`](docs/AGENT_REFERENCE_EN.md): the complete English
+agent reference covering all 52 tools and every section/category parameter, with
+physical parameters and facial-expression limits. It is generated from the live
+registry with `python tools/gen_agent_reference_en.py`.
+
 ## Editing textures
 
 `docs/TEXTURES.md`: where the textures are (clothing, hair, scalp, skin, eyes), the three ways to change them

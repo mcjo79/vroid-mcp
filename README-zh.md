@@ -54,6 +54,7 @@ Uninstall-VRoidMcp.exe /S /REMOVEBEPINEX /REMOVECACHE
 
 ## 文档
 
+- **面向代理的英文参考**: [AGENT_REFERENCE_EN.md](docs/AGENT_REFERENCE_EN.md) — 52 个工具、每个分区/类别的参数、身体尺寸和表情限制
 - [MCP 参考](docs/REFERENCE.md)（法语）
 - [贴图编辑](docs/TEXTURES.md)（法语）
 - [网站](https://mcjo79.github.io/vroid-mcp/zh/)

@@ -54,6 +54,7 @@ Uninstall-VRoidMcp.exe /S /REMOVEBEPINEX /REMOVECACHE
 
 ## ドキュメント
 
+- **エージェント向け英語リファレンス**: [AGENT_REFERENCE_EN.md](docs/AGENT_REFERENCE_EN.md) — 52 ツール、全セクション／カテゴリのパラメータ、身体寸法、表情の制限
 - [MCP リファレンス](docs/REFERENCE.md)（フランス語）
 - [テクスチャ編集](docs/TEXTURES.md)（フランス語）
 - [Web サイト](https://mcjo79.github.io/vroid-mcp/ja/)

@@ -103,6 +103,12 @@ python tools/gen_reference.py
 
 La documentation est aussi disponible en japonais et en chinois simplifié (voir les liens de langue en haut).
 
+Pour un agent qui utilise le serveur via MCP (DeepSeek Harness inclus), voir
+[`docs/AGENT_REFERENCE_EN.md`](docs/AGENT_REFERENCE_EN.md) : la référence anglaise
+complète, avec les 52 outils et tous les paramètres par section/catégorie, les
+paramètres physiques et les limites des expressions faciales. Elle est générée
+depuis le registre vivant avec `python tools/gen_agent_reference_en.py`.
+
 ## Éditer les textures
 
 `docs/TEXTURES.md` : où se trouvent les textures (vêtements, cheveux, crâne, peau, yeux), les trois façons de les
