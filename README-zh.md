@@ -2,23 +2,46 @@
 
 [English](README.md) | [Français](README-fr.md) | [日本語](README-ja.md) | **简体中文**
 
-本地 MCP 桥接，让 AI（Claude Code、Claude Desktop、DeepSeek 等）读取和编辑 VRoid Studio 中打开的模型。
+本地 MCP 桥接，让 AI（Claude Code、Claude Desktop、DeepSeek Harness 等）读取和编辑 VRoid Studio 中打开的模型。
 
 ## 环境要求
 
-- Windows 与 VRoid Studio 2.14
-- **已内置 Python 3.12**（无需安装；有网络时会自动安装 numpy 和 Pillow）
+- Windows 10 / 11 与 VRoid Studio 2.16（Steam）
+- **已内置 Python 3.12、numpy 和 Pillow**。无需安装 Python，也无需配置 PATH。
 - BepInEx 6 IL2CPP（由安装器安装）
-
-安装器直接使用包内的 `python\python.exe`，无需配置 PATH。
+- 无需管理员权限。
 
 ## 安装
 
-1. 从 GitHub Releases 下载 `VRoidMcp-Setup-v<version>.exe`。
-2. 关闭 VRoid Studio，运行安装程序（无需管理员权限，支持中文）。
-3. 重启 Claude Code / Claude Desktop，然后调用 `vroid_status`。
+1. 从 GitHub Releases 下载 **`VRoidMcp-Setup-v<version>.exe`**。
+2. **完全退出 VRoid Studio 和 Claude Desktop**（Claude Desktop 需从托盘退出）。
+3. 运行安装程序。支持中文等四种语言，无需管理员权限，也不会打开控制台。
+   - 可选择 Claude Code / Claude Desktop、DeepSeek Harness、重新安装 BepInEx。
+   - VRoid Studio 文件夹会从 Steam 库自动检测（找不到时可手动浏览）。
+4. 启动 VRoid Studio（BepInEx 首次启动会多花 1–2 分钟）。
+5. 重启 Claude Code / Claude Desktop / DeepSeek Harness，然后调用 `vroid_status`。
 
-安装器会配置 BepInEx 6、插件、MCP 服务器和默认文档。可在 Windows“设置 → 应用”中卸载。安装失败时，日志位于 `%TEMP%\VRoidMcp-install.log`。
+安装器会配置 BepInEx 6、插件、MCP 服务器、Python 3.12、numpy、Pillow 和默认文档。它会出现在 Windows“设置 → 应用”中，并创建卸载程序和开始菜单快捷方式。日志位于 `%TEMP%\VRoidMcp-install.log`。
+
+静默安装：
+
+```bat
+VRoidMcp-Setup-v<version>.exe /S /GAMEDIR="<VRoid Studio 文件夹>" /NOCLAUDE /NODSH
+```
+
+卸载：
+
+```bat
+Uninstall-VRoidMcp.exe /S /REMOVEBEPINEX /REMOVECACHE
+```
+
+## 0.12 新功能
+
+- **Windows 安装器（NSIS）**：用四语言标准向导替代 `Installer.cmd`，无需管理员权限，也没有控制台窗口。
+- **内置 Python 3.12 + numpy + Pillow**：无需网络，也无需 `pip`；0.11 的“Python 3.8+ 在 PATH 中”要求已取消。
+- **DeepSeek Harness 连接器**：在 Web / Desktop 的所有配置文件中注册 `vroid` 服务器。
+- **VRoid Studio 2.16 / Unity 6 稳定性**：首次加载编辑器时最多等待 120 秒。
+- **预设缓存保护**：当 VRoid 处于模型选择界面或无法读取自定义项目时，不再把现有缓存标记为已删除。
 
 ## 主要功能（52 个工具）
 

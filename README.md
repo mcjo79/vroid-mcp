@@ -8,6 +8,14 @@ Lets an AI (Claude Code, Claude Desktop…) read and edit the model open in VRoi
 AI ──MCP (stdio)──> mcp_server/vroid_mcp.py ──HTTP 127.0.0.1:7811──> BepInEx plugin (inside VRoid) ──> VRoidCore.Editing.Context
 ```
 
+## What's new in 0.12
+
+- **Windows installer (NSIS)**: a standard four-language wizard replaces `Installer.cmd`; no administrator rights, no console, entry in *Installed apps* and an uninstaller.
+- **Python 3.12, numpy and Pillow are bundled**: no Python install, no PATH, no `pip` and no network access needed. The 0.11 *Python 3.8+ in PATH* requirement is gone.
+- **DeepSeek Harness connector**: the `vroid` server is registered in every web and desktop Harness profile.
+- **VRoid Studio 2.16 / Unity 6 reliability**: the first editor load of a session now waits up to 120 s.
+- **Preset cache protection**: a scan at the model menu, or one that cannot read custom items, no longer marks the cache as removed.
+
 ## Installation (release)
 
 1. Download **`VRoidMcp-Setup-v<version>.exe`** from the GitHub releases.
@@ -46,9 +54,9 @@ First launch after installing BepInEx: one to two extra minutes (interop assembl
 |---|---|
 | BepInEx 6 BE #791 (IL2CPP) | `<VRoid Studio folder>\BepInEx` |
 | Plugin (source) | `VRoidMcpBridge/` → built into `BepInEx\plugins\VRoidMcpBridge` |
-| MCP server | `mcp_server/vroid_mcp.py` (Python 3, no dependencies) |
+| MCP server | `mcp_server/vroid_mcp.py` (bundled Python 3.12, numpy and Pillow) |
 | Framing defaults | `config/framing.json` (per category/body part; local overrides in the preset cache) |
-| Installer | `installer/` (`build_release.py` builds the release package) |
+| Installer | `installer/` (NSIS script, `build_release.py` and the portable ZIP payload) |
 
 ## Building the plugin
 
@@ -63,14 +71,23 @@ dotnet build -c Release -p:GameDir="<VRoid Studio folder>"
 
 The installer does this. Otherwise, in Claude Code:
 
+The installed copy already has its own runtime:
+
 ```
-claude mcp add vroid -- python <path>\mcp_server\vroid_mcp.py
+claude mcp add vroid -- "%LOCALAPPDATA%\VRoidMcp\python\python.exe" "%LOCALAPPDATA%\VRoidMcp\mcp_server\vroid_mcp.py"
 ```
 
 Or in Claude Desktop (`claude_desktop_config.json`):
 
 ```json
-{ "mcpServers": { "vroid": { "command": "python", "args": ["<path>\\mcp_server\\vroid_mcp.py"] } } }
+{
+  "mcpServers": {
+    "vroid": {
+      "command": "C:\\Users\\<you>\\AppData\\Local\\VRoidMcp\\python\\python.exe",
+      "args": ["C:\\Users\\<you>\\AppData\\Local\\VRoidMcp\\mcp_server\\vroid_mcp.py"]
+    }
+  }
+}
 ```
 
 ## Full reference

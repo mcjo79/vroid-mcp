@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ja" class="no-js" data-privacy="../privacy/">
 <head>
   <meta charset="utf-8">
@@ -77,14 +77,14 @@
       <div class="hero-glow" aria-hidden="true"></div>
       <div class="container hero-grid">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="eyebrow-dot"></span>Open source · Windows · VRoid 2.14</p>
+          <p class="eyebrow"><span class="eyebrow-dot"></span>Open source · Windows · VRoid 2.16</p>
           <h1>VRoid キャラクターを<span class="hl">まとめて</span>制作。</h1>
           <p class="lede">Claude から VRoid Studio を操作し、プリセット・テクスチャ・色を変えながら複数のキャラクターを作成・VRM 書き出し。エディターを何度もクリックする必要はありません。Claude Code / Claude Desktop / MCP クライアントに対応。プロトコルの知識は不要です。</p>
           <div class="hero-cta">
             <a class="btn btn-primary" href="#batch">バッチ例を見る</a>
             <a class="btn btn-secondary" href="#prerequisites">v0.12.0 をダウンロード</a>
           </div>
-          <ul class="hero-meta"><li><span class="status-dot"></span>BepInEx 6 · IL2CPP</li><li>Python 3.8+ (PATH)</li><li>127.0.0.1:7811</li></ul>
+          <ul class="hero-meta"><li><span class="status-dot"></span>BepInEx 6 · IL2CPP</li><li>Python 3.12 同梱</li><li>127.0.0.1:7811</li></ul>
         </div>
         <figure class="hero-visual" data-reveal><div class="hero-card"><span class="hero-tag">このブリッジで作成</span><img src="../assets/img/hero.jpg" alt="VRoid character made with the MCP bridge" width="760" height="1131" fetchpriority="high"></div><figcaption>同じツールで制作した出力例。</figcaption></figure>
       </div>
@@ -273,16 +273,16 @@
       <p class="lede">提供済み、作業中、まだ提供していない研究を分けて示します。</p>
     </header>
     <div class="features">
-<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">●</span><p class="eyebrow">現在 · 提供中</p><p>52 の MCP ツール、VRM 書き出し、バッチ、最小化/バックグラウンド、4 言語ヘルプ。</p></article>
+<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">●</span><p class="eyebrow">現在 · 提供中</p><p>52 の MCP ツール、VRM 書き出し、バッチ、4 言語の Windows インストーラー。Python 3.12、numpy、Pillow、DeepSeek Harness も同梱。</p></article>
 <article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">◐</span><p class="eyebrow">次 · 作業中</p><p>衣装テクスチャのレシピ、バッチプリセット、例とドキュメントの拡充。</p></article>
 <article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">○</span><p class="eyebrow">研究 · 未提供</p><p>ComfyUI テクスチャ、専用 LoRA、コミュニティ評価。協力歓迎ですが、約束はしません。</p></article>
     </div>
   </div>
 </section>
 
-<section class="section" id="installation"><div class="container"><header class="section-head" data-reveal><p class="eyebrow"><span class="eyebrow-num">08</span>インストール</p><h2>3 ステップで導入</h2><p class="lede">Windows、VRoid Studio、Python 3.8+ (PATH)。インストーラーが BepInEx 6、プラグイン、MCP サーバーを設定します。</p></header><div class="install-grid"><ol class="install-steps" data-reveal><li><div><h3>VRoid を閉じる</h3><p>VRoid Studio を終了します。</p></div></li><li><div><h3>インストーラーを実行</h3><p><code>VRoidMcp-Setup-v&lt;version&gt;.exe</code> を実行（管理者権限不要）。BepInEx 6、プラグイン、MCP サーバーを導入します。</p></div></li><li><div><h3>クライアントを再起動</h3><p>Claude Code / Claude Desktop を再起動し、<code>vroid_status</code> を呼びます。</p></div></li></ol><div class="install-details" data-reveal><h3 id="prerequisites">必要条件</h3><ul class="check-list"><li>Windows 10 / 11</li><li>VRoid Studio 2.14</li><li>Python 3.8+（PATH）</li><li>numpy / Pillow（テクスチャ推奨）</li></ul><h3>リンク</h3><p><a href="https://github.com/mcjo79/vroid-mcp/blob/main/README.md">README</a> · <a href="https://github.com/mcjo79/vroid-mcp/blob/main/docs/REFERENCE.md">MCP reference</a> · <a href="https://github.com/mcjo79/vroid-mcp/releases/latest">最新リリースをダウンロード</a></p><p>MIT ライセンス。ツール名と引数は英語です。</p></div></div></div></section>
+<section class="section" id="installation"><div class="container"><header class="section-head" data-reveal><p class="eyebrow"><span class="eyebrow-num">08</span>インストール</p><h2>3 ステップで導入</h2><p class="lede">Windows と VRoid Studio 2.16 だけ。Python 3.12、numpy、Pillow、BepInEx はインストーラーに同梱されています。</p></header><div class="install-grid"><ol class="install-steps" data-reveal><li><div><h3>VRoid と Claude を閉じる</h3><p>VRoid Studio と Claude Desktop を完全に終了します。</p></div></li><li><div><h3>インストーラーを実行</h3><p><code>VRoidMcp-Setup-v&lt;version&gt;.exe</code> を実行。4 言語対応、管理者権限不要。Claude Code / Desktop、DeepSeek Harness、BepInEx の再インストールを選択できます。</p></div></li><li><div><h3>VRoid を起動してからクライアントを再起動</h3><p>BepInEx 初回起動は 1〜2 分余分にかかります。その後 Claude Code / Desktop または DeepSeek Harness を再起動し、<code>vroid_status</code> を呼びます。</p></div></li></ol><div class="install-details" data-reveal><h3 id="prerequisites">必要条件</h3><ul class="check-list"><li>Windows 10 / 11</li><li>VRoid Studio 2.16（Steam）</li><li>Python 不要 — 3.12、numpy、Pillow を同梱</li><li>BepInEx 6 はインストーラーが導入</li></ul><p><strong>0.12 の新機能：</strong> 標準 Windows インストーラー、Python/numpy/Pillow の同梱、DeepSeek Harness 対応、VRoid 2.16 の安定性。</p><h3>リンク</h3><p><a href="https://github.com/mcjo79/vroid-mcp/blob/main/README-ja.md">README</a> · <a href="https://github.com/mcjo79/vroid-mcp/blob/main/docs/REFERENCE.md">MCP reference</a> · <a href="https://github.com/mcjo79/vroid-mcp/releases/latest">最新リリースをダウンロード</a></p><p>MIT ライセンス。ログ: <code>%TEMP%\VRoidMcp-install.log</code>。アンインストールは Windows の設定 → アプリ。</p></div></div></div></section>
   </main>
-  <footer class="site-footer"><div class="container footer-grid"><div class="footer-brand"><p>VRoid MCP Bridge</p><p>v0.12.0 · MIT</p></div><nav class="footer-col"><a href="https://github.com/mcjo79/vroid-mcp">GitHub</a><a href="https://github.com/mcjo79/vroid-mcp/releases/latest">ダウンロード</a><a href="https://github.com/mcjo79/vroid-mcp/blob/main/README.md">ドキュメント</a></nav><nav class="footer-col"><a href="../privacy/">プライバシー (EN)</a><a href="https://github.com/mcjo79/vroid-mcp/blob/main/LICENSE">MIT</a></nav><div class="footer-col"><p class="footer-status"><span class="status-dot"></span>v0.12.0 · public</p></div></div></footer>
+  <footer class="site-footer"><div class="container footer-grid"><div class="footer-brand"><p>VRoid MCP Bridge</p><p>v0.12.0 · MIT</p></div><nav class="footer-col"><a href="https://github.com/mcjo79/vroid-mcp">GitHub</a><a href="https://github.com/mcjo79/vroid-mcp/releases/latest">ダウンロード</a><a href="https://github.com/mcjo79/vroid-mcp/blob/main/README-ja.md">ドキュメント</a></nav><nav class="footer-col"><a href="../privacy/">プライバシー (EN)</a><a href="https://github.com/mcjo79/vroid-mcp/blob/main/LICENSE">MIT</a></nav><div class="footer-col"><p class="footer-status"><span class="status-dot"></span>v0.12.0 · public</p></div></div></footer>
   <script src="../assets/js/main.js" defer></script>
 </body>
 </html>

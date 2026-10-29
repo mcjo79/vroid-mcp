@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="zh" class="no-js" data-privacy="../privacy/">
 <head>
   <meta charset="utf-8">
@@ -77,14 +77,14 @@
       <div class="hero-glow" aria-hidden="true"></div>
       <div class="container hero-grid">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="eyebrow-dot"></span>Open source · Windows · VRoid 2.14</p>
+          <p class="eyebrow"><span class="eyebrow-dot"></span>Open source · Windows · VRoid 2.16</p>
           <h1>批量制作 <span class="hl">VRoid 角色</span>。</h1>
           <p class="lede">通过 Claude 操作 VRoid Studio，更换预设、贴图和颜色，批量生成角色并导出 VRM。无需反复点击编辑器。兼容 Claude Code、Claude Desktop 和任何 MCP 客户端，无需了解协议。</p>
           <div class="hero-cta">
             <a class="btn btn-primary" href="#batch">查看批处理示例</a>
             <a class="btn btn-secondary" href="#prerequisites">下载 v0.12.0</a>
           </div>
-          <ul class="hero-meta"><li><span class="status-dot"></span>BepInEx 6 · IL2CPP</li><li>Python 3.8+ (PATH)</li><li>127.0.0.1:7811</li></ul>
+          <ul class="hero-meta"><li><span class="status-dot"></span>BepInEx 6 · IL2CPP</li><li>已内置 Python 3.12</li><li>127.0.0.1:7811</li></ul>
         </div>
         <figure class="hero-visual" data-reveal><div class="hero-card"><span class="hero-tag">通过桥接创建</span><img src="../assets/img/hero.jpg" alt="VRoid character made with the MCP bridge" width="760" height="1131" fetchpriority="high"></div><figcaption>使用同一工具制作的输出示例。</figcaption></figure>
       </div>
@@ -273,16 +273,16 @@
       <p class="lede">明确区分已发布、进行中和尚未提供的研究。</p>
     </header>
     <div class="features">
-<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">●</span><p class="eyebrow">现在 · 已发布</p><p>52 个 MCP 工具、原生 VRM 导出、批处理、最小化/后台模式、四语言帮助。</p></article>
+<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">●</span><p class="eyebrow">现在 · 已发布</p><p>52 个 MCP 工具、原生 VRM 导出、批处理、四语言 Windows 安装器；内置 Python 3.12、numpy、Pillow 和 DeepSeek Harness。</p></article>
 <article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">◐</span><p class="eyebrow">下一步 · 进行中</p><p>服装贴图配方、批处理预设、更多示例和文档。</p></article>
 <article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">○</span><p class="eyebrow">研究 · 未发布</p><p>ComfyUI 贴图流程、专用 LoRA、社区评估。欢迎合作，但暂不承诺。</p></article>
     </div>
   </div>
 </section>
 
-<section class="section" id="installation"><div class="container"><header class="section-head" data-reveal><p class="eyebrow"><span class="eyebrow-num">08</span>安装</p><h2>三步安装</h2><p class="lede">Windows、VRoid Studio、Python 3.8+ (PATH)。安装器会配置 BepInEx 6、插件和 MCP 服务器。</p></header><div class="install-grid"><ol class="install-steps" data-reveal><li><div><h3>关闭 VRoid</h3><p>退出 VRoid Studio。</p></div></li><li><div><h3>运行安装器</h3><p>运行 <code>VRoidMcp-Setup-v&lt;version&gt;.exe</code>（无需管理员权限），自动安装 BepInEx 6、插件和 MCP 服务器。</p></div></li><li><div><h3>重启客户端</h3><p>重启 Claude Code / Claude Desktop，然后调用 <code>vroid_status</code>。</p></div></li></ol><div class="install-details" data-reveal><h3 id="prerequisites">环境要求</h3><ul class="check-list"><li>Windows 10 / 11</li><li>VRoid Studio 2.14</li><li>Python 3.8+（PATH）</li><li>建议安装 numpy / Pillow</li></ul><h3>链接</h3><p><a href="https://github.com/mcjo79/vroid-mcp/blob/main/README.md">README</a> · <a href="https://github.com/mcjo79/vroid-mcp/blob/main/docs/REFERENCE.md">MCP reference</a> · <a href="https://github.com/mcjo79/vroid-mcp/releases/latest">下载最新版本</a></p><p>MIT 许可证；工具名和参数为英文。</p></div></div></div></section>
+<section class="section" id="installation"><div class="container"><header class="section-head" data-reveal><p class="eyebrow"><span class="eyebrow-num">08</span>安装</p><h2>三步安装</h2><p class="lede">只需 Windows 与 VRoid Studio 2.16。安装器已包含 Python 3.12、numpy、Pillow 和 BepInEx。</p></header><div class="install-grid"><ol class="install-steps" data-reveal><li><div><h3>关闭 VRoid 和 Claude</h3><p>完全退出 VRoid Studio 和 Claude Desktop。</p></div></li><li><div><h3>运行安装器</h3><p>运行 <code>VRoidMcp-Setup-v&lt;version&gt;.exe</code>。支持四种语言，无需管理员权限；可选择 Claude Code / Desktop、DeepSeek Harness 或重新安装 BepInEx。</p></div></li><li><div><h3>先启动 VRoid，再重启客户端</h3><p>BepInEx 首次启动会多花 1–2 分钟。然后重启 Claude Code / Desktop 或 DeepSeek Harness，并调用 <code>vroid_status</code>。</p></div></li></ol><div class="install-details" data-reveal><h3 id="prerequisites">环境要求</h3><ul class="check-list"><li>Windows 10 / 11</li><li>VRoid Studio 2.16（Steam）</li><li>无需 Python — 已内置 3.12、numpy、Pillow</li><li>BepInEx 6 由安装器安装</li></ul><p><strong>0.12 新功能：</strong> 标准 Windows 安装器、内置 Python/numpy/Pillow、DeepSeek Harness 支持，以及 VRoid 2.16 稳定性。</p><h3>链接</h3><p><a href="https://github.com/mcjo79/vroid-mcp/blob/main/README-zh.md">README</a> · <a href="https://github.com/mcjo79/vroid-mcp/blob/main/docs/REFERENCE.md">MCP reference</a> · <a href="https://github.com/mcjo79/vroid-mcp/releases/latest">下载最新版本</a></p><p>MIT 许可证。日志：<code>%TEMP%\VRoidMcp-install.log</code>。卸载请使用 Windows“设置 → 应用”。</p></div></div></div></section>
   </main>
-  <footer class="site-footer"><div class="container footer-grid"><div class="footer-brand"><p>VRoid MCP Bridge</p><p>v0.12.0 · MIT</p></div><nav class="footer-col"><a href="https://github.com/mcjo79/vroid-mcp">GitHub</a><a href="https://github.com/mcjo79/vroid-mcp/releases/latest">下载</a><a href="https://github.com/mcjo79/vroid-mcp/blob/main/README.md">文档</a></nav><nav class="footer-col"><a href="../privacy/">隐私 (EN)</a><a href="https://github.com/mcjo79/vroid-mcp/blob/main/LICENSE">MIT</a></nav><div class="footer-col"><p class="footer-status"><span class="status-dot"></span>v0.12.0 · public</p></div></div></footer>
+  <footer class="site-footer"><div class="container footer-grid"><div class="footer-brand"><p>VRoid MCP Bridge</p><p>v0.12.0 · MIT</p></div><nav class="footer-col"><a href="https://github.com/mcjo79/vroid-mcp">GitHub</a><a href="https://github.com/mcjo79/vroid-mcp/releases/latest">下载</a><a href="https://github.com/mcjo79/vroid-mcp/blob/main/README-zh.md">文档</a></nav><nav class="footer-col"><a href="../privacy/">隐私 (EN)</a><a href="https://github.com/mcjo79/vroid-mcp/blob/main/LICENSE">MIT</a></nav><div class="footer-col"><p class="footer-status"><span class="status-dot"></span>v0.12.0 · public</p></div></div></footer>
   <script src="../assets/js/main.js" defer></script>
 </body>
 </html>

@@ -123,7 +123,7 @@
       <div class="hero-glow" aria-hidden="true"></div>
       <div class="container hero-grid">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="eyebrow-dot"></span>Open source · Windows · VRoid 2.14</p>
+          <p class="eyebrow"><span class="eyebrow-dot"></span>Open source · Windows · VRoid 2.16</p>
           <h1>Create <span class="hl">VRoid characters</span> in batches.</h1>
           <p class="lede">Build, dress, texture and export VRoid character variants from Claude — without clicking through the editor. Undoable, scriptable, and installed in minutes. Works with Claude Code, Claude Desktop, or any MCP client; no protocol knowledge required.</p>
           <div class="hero-cta">
@@ -132,7 +132,7 @@
           </div>
           <ul class="hero-meta" aria-label="Compatibility">
             <li><span class="status-dot"></span>BepInEx 6 · IL2CPP</li>
-            <li>Python 3.8+ (PATH)</li>
+            <li>Python 3.12 included</li>
             <li>127.0.0.1:7811</li>
           </ul>
         </div>
@@ -566,7 +566,7 @@
       <p class="lede">Clear boundaries: shipped tools, work in progress, and research that is not available yet.</p>
     </header>
     <div class="features">
-<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">●</span><p class="eyebrow">Now · Shipped</p><p>52 MCP tools, native VRM export, batch operations, minimized/background mode, four-language help.</p></article>
+<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">●</span><p class="eyebrow">Now · Shipped</p><p>52 MCP tools, native VRM export, batch operations, and a four-language Windows installer with Python 3.12, NumPy, Pillow and DeepSeek Harness support.</p></article>
 <article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">◐</span><p class="eyebrow">Next · In progress</p><p>Clothing texture recipes, batch presets, more examples and documentation.</p></article>
 <article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">○</span><p class="eyebrow">Research · Not shipped</p><p>ComfyUI texture workflows, a specialized LoRA, and community evaluation. Collaboration welcome — no promises yet.</p></article>
     </div>
@@ -578,22 +578,22 @@
         <header class="section-head" data-reveal>
           <p class="eyebrow"><span class="eyebrow-num">08</span>Install</p>
           <h2>Three steps, one installer.</h2>
-          <p class="lede">Windows, VRoid Studio and Python 3.8+ (PATH). The installer takes care of BepInEx 6, the plugin, the MCP server and the Claude configuration.</p>
+          <p class="lede">Windows and VRoid Studio 2.16. Nothing else to install: the setup bundles Python 3.12, NumPy, Pillow, BepInEx 6, the plugin and the MCP server.</p>
         </header>
 
         <div class="install-grid">
           <ol class="install-steps" data-reveal>
             <li>
               <span class="step">1</span>
-              <div><h3>Download the release</h3><p>Get <code>VRoidMcp-Setup-v&lt;version&gt;.exe</code> from GitHub Releases.</p></div>
+              <div><h3>Download the Windows installer</h3><p>Get <code>VRoidMcp-Setup-v&lt;version&gt;.exe</code> from GitHub Releases. The <code>.zip</code> remains the portable fallback.</p></div>
             </li>
             <li>
               <span class="step">2</span>
-              <div><h3>Close VRoid, run the installer</h3><p>Run the setup: a regular Windows installer, no administrator rights, no console. It finds VRoid through Steam, installs BepInEx if needed and copies the plugin.</p></div>
+              <div><h3>Close VRoid and Claude Desktop</h3><p>Run the setup: a regular Windows installer, no administrator rights, no console. Choose Claude Code/Desktop, DeepSeek Harness or a BepInEx reinstall; it finds VRoid through Steam and installs everything.</p></div>
             </li>
             <li>
               <span class="step">3</span>
-              <div><h3>Restart Claude</h3><p>Restart Claude Code or Claude Desktop: the <code>vroid_*</code> tools appear in the session.</p></div>
+              <div><h3>Start VRoid, then your client</h3><p>Start VRoid first (BepInEx adds one to two minutes on the first launch), then restart Claude Code/Desktop or DeepSeek Harness and call <code>vroid_status</code>.</p></div>
             </li>
           </ol>
 
@@ -601,11 +601,11 @@
             <h3 id="prerequisites">Requirements</h3>
             <ul class="check-list">
               <li>Windows 10 / 11</li>
-              <li>VRoid Studio (Steam, Unity 6000.0.62)</li>
-              <li>Python 3.8 or newer</li>
-              <li>numpy and Pillow recommended for textures</li>
+              <li>VRoid Studio 2.16 (Steam)</li>
+              <li>No Python needed — 3.12, NumPy and Pillow are included</li>
+              <li>BepInEx 6, installed by the setup</li>
             </ul>
-            <p class="req-note">The first launch after BepInEx takes one to two extra minutes (interop generation).</p>
+            <p class="req-note"><strong>New in 0.12:</strong> one Windows installer, a bundled Python 3.12 runtime with NumPy/Pillow, DeepSeek Harness in every profile, and VRoid Studio 2.16 support. The first launch after BepInEx takes one to two extra minutes (interop generation).</p>
             <a class="btn btn-primary btn-block" href="https://github.com/mcjo79/vroid-mcp/releases/latest" target="_blank" rel="noopener">Download the latest release</a>
           </aside>
         </div>
@@ -617,8 +617,9 @@
               <li>Finds VRoid in your Steam libraries (otherwise pick its folder with &laquo;&nbsp;Browse&hellip;&nbsp;&raquo;).</li>
               <li>Installs BepInEx 6.0.0-be.791 IL2CPP, verifies the SHA-256, and sets aside a previous version.</li>
               <li>Copies the plugin to <code>BepInEx\plugins\VRoidMcpBridge</code>.</li>
-              <li>Copies the server, tools and documentation to <code>%LOCALAPPDATA%\VRoidMcp</code>.</li>
-              <li>Registers the <code>vroid</code> server in Claude Code and Claude Desktop, after backing up the configuration.</li>
+              <li>Copies the server, Python 3.12, NumPy, Pillow, tools and documentation to <code>%LOCALAPPDATA%\VRoidMcp</code>.</li>
+              <li>Registers the <code>vroid</code> server in Claude Code, Claude Desktop and every DeepSeek Harness profile, after backing up the configuration.</li>
+              <li>Adds VRoid MCP Bridge to Windows <em>Installed apps</em>, with an uninstaller and Start-menu shortcuts.</li>
             </ul>
           </details>
           <details class="info-block">
@@ -627,7 +628,7 @@
           </details>
           <details class="info-block">
             <summary>Security and privacy</summary>
-            <p>The HTTP server only listens on <code>127.0.0.1:7811</code>. No data is sent over the network. The MCP server runs over stdio with no Python dependencies. All changes can be undone in VRoid.</p>
+            <p>The HTTP server only listens on <code>127.0.0.1:7811</code>. No data is sent over the network. The MCP server runs over stdio with its bundled Python 3.12, NumPy and Pillow: no packages are downloaded. All changes can be undone in VRoid.</p>
           </details>
         </div>
       </div>
@@ -663,9 +664,9 @@
           <h3>Validated environment</h3>
           <table>
             <tbody>
-              <tr><th scope="row">VRoid Studio</th><td>2.14.0</td><th scope="row">Unity</th><td>6000.0.62f1</td></tr>
+              <tr><th scope="row">VRoid Studio</th><td>2.16.0</td><th scope="row">Unity</th><td>6000.0.62f1</td></tr>
               <tr><th scope="row">BepInEx</th><td>6.0.0-be.791 (IL2CPP)</td><th scope="row">Plugin</th><td>0.12.0</td></tr>
-              <tr><th scope="row">MCP server</th><td>Python 3.8+ (PATH), stdlib</td><th scope="row">System</th><td>Windows 10 / 11</td></tr>
+              <tr><th scope="row">MCP server</th><td>Python 3.12 embedded, NumPy/Pillow</td><th scope="row">System</th><td>Windows 10 / 11</td></tr>
             </tbody>
           </table>
         </div>
@@ -691,8 +692,12 @@
             <p>No. The server speaks MCP over stdio: Claude Code and Claude Desktop are configured by the installer, but any compatible MCP client — including DeepSeek — can launch <code>vroid_mcp.py</code> and call the tools.</p>
           </details>
           <details>
+            <summary>Do I need Python?</summary>
+            <p>No. The installer includes Python 3.12, NumPy and Pillow under <code>%LOCALAPPDATA%\VRoidMcp\python</code>. Nothing is added to PATH and no <code>pip</code> install is needed.</p>
+          </details>
+          <details>
             <summary>Does it work with the latest VRoid?</summary>
-            <p>The bridge is validated with VRoid Studio 2.14.0 (Unity 6000.0.62). An update may rename internal classes; in that case the dump has to be redone and the plugin adjusted.</p>
+            <p>The bridge is validated with VRoid Studio 2.16.0 (Unity 6000.0.62). An update may rename internal classes; in that case the dump has to be redone and the plugin adjusted.</p>
           </details>
           <details>
             <summary>Are changes permanent?</summary>

@@ -8,6 +8,14 @@ Permet à une IA (Claude Code, Claude Desktop…) de lire et modifier le modèle
 IA ──MCP (stdio)──> mcp_server/vroid_mcp.py ──HTTP 127.0.0.1:7811──> plugin BepInEx (dans VRoid) ──> VRoidCore.Editing.Context
 ```
 
+## Nouveautés de la 0.12
+
+- **Installeur Windows (NSIS)** : un assistant standard en quatre langues remplace `Installer.cmd` ; sans droits administrateur, sans console, avec une entrée dans *Applications installées* et un désinstalleur.
+- **Python 3.12, numpy et Pillow sont embarqués** : aucun Python à installer, aucun PATH, aucun `pip` et aucun accès réseau nécessaire. Le prérequis *Python 3.8+ dans le PATH* de la 0.11 disparaît.
+- **Connecteur DeepSeek Harness** : le serveur `vroid` est déclaré dans chaque profil web et desktop du harnais.
+- **Fiabilité VRoid Studio 2.16 / Unity 6** : le premier chargement de l'éditeur d'une session attend désormais jusqu'à 120 s.
+- **Protection du cache des presets** : un scan effectué au menu des modèles, ou qui ne peut pas lire les éléments personnalisés, ne marque plus le cache comme supprimé.
+
 ## Installation (release)
 
 1. Télécharger **`VRoidMcp-Setup-v<version>.exe`** depuis les releases GitHub.
@@ -47,9 +55,9 @@ Premier lancement après installation de BepInEx : une à deux minutes de plus (
 |---|---|
 | BepInEx 6 BE #791 (IL2CPP) | `<dossier de VRoid Studio>\BepInEx` |
 | Plugin (source) | `VRoidMcpBridge/` → compilé dans `BepInEx\plugins\VRoidMcpBridge` |
-| Serveur MCP | `mcp_server/vroid_mcp.py` (Python 3, aucune dépendance) |
+| Serveur MCP | `mcp_server/vroid_mcp.py` (Python 3.12, numpy et Pillow embarqués) |
 | Cadrage par défaut | `config/framing.json` (par catégorie/partie du corps ; overrides locaux dans le cache) |
-| Installeur | `installer/` (`build_release.py` construit le paquet de release) |
+| Installeur | `installer/` (script NSIS, `build_release.py` et le ZIP portable) |
 
 ## Recompiler le plugin
 
@@ -64,14 +72,23 @@ assemblages `BepInEx\interop` existent.)
 
 L'installeur le fait. Sinon, dans Claude Code :
 
+La copie installée possède déjà son propre runtime :
+
 ```
-claude mcp add vroid -- python <chemin>\mcp_server\vroid_mcp.py
+claude mcp add vroid -- "%LOCALAPPDATA%\VRoidMcp\python\python.exe" "%LOCALAPPDATA%\VRoidMcp\mcp_server\vroid_mcp.py"
 ```
 
 Ou dans Claude Desktop (`claude_desktop_config.json`) :
 
 ```json
-{ "mcpServers": { "vroid": { "command": "python", "args": ["<chemin>\\mcp_server\\vroid_mcp.py"] } } }
+{
+  "mcpServers": {
+    "vroid": {
+      "command": "C:\\Users\\<vous>\\AppData\\Local\\VRoidMcp\\python\\python.exe",
+      "args": ["C:\\Users\\<vous>\\AppData\\Local\\VRoidMcp\\mcp_server\\vroid_mcp.py"]
+    }
+  }
+}
 ```
 
 ## Référence complète
