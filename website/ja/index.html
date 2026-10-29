@@ -54,8 +54,13 @@
         <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="currentColor"/><path d="M16 18 L32 46 L48 18" fill="none" stroke="#F0C23A" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="49" cy="16" r="6" fill="#B02A37"/></svg>
         <span class="brand-text">VRoid <b>MCP</b><small>Bridge</small></span>
       </a>
-      <nav class="nav" id="nav" aria-label="ホーム">
-        <a href="#apercu">概要</a><a href="#fonctions">機能</a><a href="#outils">ツール</a><a href="#installation">インストール</a>
+      <nav class="nav" id="nav" aria-label="Navigation">
+        <a href="#usecases">用途</a>
+        <a href="#batch">バッチ</a>
+        <a href="#fonctions">機能</a>
+        <a href="#apercu">仕組み</a>
+        <a href="#outils">ツール</a>
+        <a href="#installation">インストール</a>
       </nav>
       <div class="header-actions">
         <div class="lang-switch" role="group" aria-label="言語">
@@ -73,27 +78,71 @@
       <div class="container hero-grid">
         <div class="hero-copy">
           <p class="eyebrow"><span class="eyebrow-dot"></span>Open source · Windows · VRoid 2.14</p>
-          <h1>AI から <span class="hl">VRoid Studio</span> を操作。</h1>
-          <p class="lede">VRoid のコマンドを MCP 経由で呼び出すローカルブリッジ。編集は履歴に残り、元に戻せます。</p>
-          <div class="hero-cta"><a class="btn btn-primary" href="https://github.com/mcjo79/vroid-mcp/releases/latest" target="_blank" rel="noopener">v0.11.0 をダウンロード</a><a class="btn btn-secondary" href="#outils">52 のツールを見る</a></div>
+          <h1>VRoid キャラクターを<span class="hl">まとめて</span>制作。</h1>
+          <p class="lede">Claude から VRoid Studio を操作し、プリセット・テクスチャ・色を変えながら複数のキャラクターを作成・VRM 書き出し。エディターを何度もクリックする必要はありません。Claude Code / Claude Desktop / MCP クライアントに対応。プロトコルの知識は不要です。</p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="#batch">バッチ例を見る</a>
+            <a class="btn btn-secondary" href="https://github.com/mcjo79/vroid-mcp/releases/latest">v0.11.0 をダウンロード</a>
+          </div>
           <ul class="hero-meta"><li><span class="status-dot"></span>BepInEx 6 · IL2CPP</li><li>Python 3.8+ (PATH)</li><li>127.0.0.1:7811</li></ul>
         </div>
-        <figure class="hero-visual" data-reveal><div class="hero-card"><span class="hero-tag">このブリッジで作成</span><img src="../assets/img/hero.jpg" alt="VRoid character made with the MCP bridge" width="760" height="1131" fetchpriority="high"></div><figcaption>MCP ツールだけで最初から最後まで作成したキャラクター。</figcaption></figure>
+        <figure class="hero-visual" data-reveal><div class="hero-card"><span class="hero-tag">このブリッジで作成</span><img src="../assets/img/hero.jpg" alt="VRoid character made with the MCP bridge" width="760" height="1131" fetchpriority="high"></div><figcaption>同じツールで制作した出力例。</figcaption></figure>
       </div>
       <div class="container"><dl class="stats" data-reveal><div><dt>MCP ツール</dt><dd>52</dd></div><div><dt>プリセット</dt><dd>1,750</dd></div><div><dt>カテゴリ</dt><dd>50</dd></div><div><dt>サーバー依存</dt><dd>0</dd></div></dl></div>
     </section>
-    <section class="section" id="apercu"><div class="container"><header class="section-head" data-reveal><p class="eyebrow"><span class="eyebrow-num">01</span>概要</p><h2>VRoid へのローカルブリッジ。</h2><p class="lede">MCP 呼び出しが VRoid のコマンドになります。履歴・テクスチャ・プリセット・カメラ・VRM 書き出しに対応。ファイルを直接書き換えず、クラウドも使いません。</p></header></div></section>
-    <section class="section" id="fonctions"><div class="container"><header class="section-head" data-reveal><p class="eyebrow"><span class="eyebrow-num">02</span>機能</p><h2>できること。</h2></header><div class="features">
+    <section class="section" id="usecases">
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <p class="eyebrow"><span class="eyebrow-num">01</span>用途</p>
+      <h2>デモではなく、制作のために。</h2>
+      <p class="lede">ベースモデルからレシピを繰り返す、具体的な使い方です。</p>
+    </header>
+    <div class="features">
+<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">◈</span><h3>VRChat ワールド</h3><p>ベースモデルから NPC やアバターのバリエーションを量産。プリセット・髪・色・服を変えられます。</p></article>
+<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">▧</span><h3>ビジュアルノベル / ゲーム</h3><p>キャラクター一覧から顔・髪・服・配色を揃えたキャストを作り、VRM を書き出します。</p></article>
+<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">✦</span><h3>アセットパック / Booth</h3><p>キャラクターや衣装のシリーズを、繰り返し使えるレシピで制作します。</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" id="batch">
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <p class="eyebrow"><span class="eyebrow-num">02</span>バッチ例</p>
+      <h2>1 つのレシピから複数のバリエーション。</h2>
+      <p class="lede">バッチはレシピです。ベースを選び、プリセット適用、テクスチャ/マテリアル変更、VRM 書き出しまでを実行します。ID とパスは自分の環境に置き換えてください。</p>
+    </header>
+    <div class="install-grid">
+      <div class="code-block" data-reveal>
+        <div class="code-head"><span>vroid_batch</span><button class="copy-btn" type="button" data-copy>Copy</button></div>
+        <pre><code>vroid_batch operations=[
+  {"tool":"vroid_apply_preset","args":{"id":"&lt;preset-id&gt;"}},
+  {"tool":"vroid_colorize","args":{"group":"&lt;group-id&gt;","r":0.72,"g":0.42,"b":0.35}},
+  {"tool":"vroid_export_vrm","args":{"path":"D:\\out\\npc_01.vrm","delete_transparent":true}}
+]</code></pre>
+      </div>
+      <div data-reveal>
+        <ol class="install-steps"><li><div><h3>ベースを選ぶ</h3><p>VRoid モデルを開き、変更する部位を決めます。</p></div></li><li><div><h3>レシピを適用</h3><p>プリセット、色、テクスチャ、体型、カメラ。</p></div></li><li><div><h3>セットを書き出す</h3><p>バリエーションごとに VRM を出力します。</p></div></li></ol>
+        <p class="lede">サンプルレシピです。結果はモデルと VRoid のバージョンによって変わります。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="apercu"><div class="container"><header class="section-head" data-reveal><p class="eyebrow"><span class="eyebrow-num">04</span>仕組み</p><h2>VRoid へのローカルブリッジ。</h2><p class="lede">MCP 呼び出しが VRoid のコマンドになります。履歴・テクスチャ・プリセット・カメラ・VRM 書き出しに対応。ファイルを直接書き換えず、クラウドも使いません。</p></header></div></section>
+
+<section class="section" id="fonctions"><div class="container"><header class="section-head" data-reveal><p class="eyebrow"><span class="eyebrow-num">05</span>機能</p><h2>できること。</h2></header><div class="features">
 <article class="feature" data-reveal><span class="feature-icon">◈</span><h3>パラメータとナビゲーション</h3><p>顔・体・服をセクション／カテゴリから選び、型付きの <code>vroid_set_param</code> で調整。</p></article>
 <article class="feature" data-reveal><span class="feature-icon">▧</span><h3>テクスチャとレイヤー</h3><p>PNG の書き出し・再読み込み、色変更、透明部分を保った編集。</p></article>
 <article class="feature" data-reveal><span class="feature-icon">✦</span><h3>髪・プリセット・キャッシュ</h3><p>髪の色・手続き型ヘア・プリセット検索と共有サムネイル。</p></article>
 <article class="feature" data-reveal><span class="feature-icon">⇩</span><h3>VRM 書き出し</h3><p>VRM 1.0 / 0.x、透明メッシュ削除、ポリゴン・マテリアル・ボーン削減をネイティブ出力で。</p></article>
 <article class="feature" data-reveal><span class="feature-icon">▣</span><h3>最小化・バックグラウンド</h3><p>VRoid を最小化したまま編集・撮影・書き出し。常時バックグラウンド動作。</p></article>
 <article class="feature" data-reveal><span class="feature-icon">↶</span><h3>安全な操作</h3><p>変更は VRoid の履歴に入り、Ctrl+Z で戻せます。保存前に状態を確認。</p></article></div></div></section>
-    <section class="section section-alt" id="outils">
+
+<section class="section section-alt" id="outils">
   <div class="container">
     <header class="section-head" data-reveal>
-      <p class="eyebrow"><span class="eyebrow-num">04</span>Tools</p>
+      <p class="eyebrow"><span class="eyebrow-num">06</span>ツール</p>
       <h2>52 ツール.</h2>
       <p class="lede">ツール名と引数は英語です。この一覧は実際の MCP レジストリから生成しています。</p>
     </header>
@@ -215,7 +264,23 @@
     </div>
   </div>
 </section>
-    <section class="section" id="installation"><div class="container"><header class="section-head" data-reveal><p class="eyebrow"><span class="eyebrow-num">05</span>インストール</p><h2>3 ステップで導入</h2><p class="lede">Windows、VRoid Studio、Python 3.8+ (PATH)。インストーラーが BepInEx 6、プラグイン、MCP サーバーを設定します。</p></header><div class="install-grid"><ol class="install-steps" data-reveal><li><div><h3>VRoid を閉じる</h3><p>VRoid Studio を終了します。</p></div></li><li><div><h3>インストーラーを実行</h3><p><code>Installer.cmd</code> をダブルクリック。BepInEx 6、プラグイン、MCP サーバーを導入します。</p></div></li><li><div><h3>クライアントを再起動</h3><p>Claude Code / Claude Desktop を再起動し、<code>vroid_status</code> を呼びます。</p></div></li></ol><div class="install-details" data-reveal><h3>リンク</h3><p><a href="https://github.com/mcjo79/vroid-mcp/blob/main/README.md">README</a> · <a href="https://github.com/mcjo79/vroid-mcp/blob/main/docs/REFERENCE.md">MCP reference</a> · <a href="https://github.com/mcjo79/vroid-mcp/releases/latest">Releases</a></p><p>MIT ライセンス。ツール名と引数は英語です。</p></div></div></div></section>
+
+<section class="section" id="roadmap">
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <p class="eyebrow"><span class="eyebrow-num">07</span>ロードマップ</p>
+      <h2>提供済みと次の予定。</h2>
+      <p class="lede">提供済み、作業中、まだ提供していない研究を分けて示します。</p>
+    </header>
+    <div class="features">
+<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">●</span><p class="eyebrow">現在 · 提供中</p><p>52 の MCP ツール、VRM 書き出し、バッチ、最小化/バックグラウンド、4 言語ヘルプ。</p></article>
+<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">◐</span><p class="eyebrow">次 · 作業中</p><p>衣装テクスチャのレシピ、バッチプリセット、例とドキュメントの拡充。</p></article>
+<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">○</span><p class="eyebrow">研究 · 未提供</p><p>ComfyUI テクスチャ、専用 LoRA、コミュニティ評価。協力歓迎ですが、約束はしません。</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="installation"><div class="container"><header class="section-head" data-reveal><p class="eyebrow"><span class="eyebrow-num">08</span>インストール</p><h2>3 ステップで導入</h2><p class="lede">Windows、VRoid Studio、Python 3.8+ (PATH)。インストーラーが BepInEx 6、プラグイン、MCP サーバーを設定します。</p></header><div class="install-grid"><ol class="install-steps" data-reveal><li><div><h3>VRoid を閉じる</h3><p>VRoid Studio を終了します。</p></div></li><li><div><h3>インストーラーを実行</h3><p><code>Installer.cmd</code> をダブルクリック。BepInEx 6、プラグイン、MCP サーバーを導入します。</p></div></li><li><div><h3>クライアントを再起動</h3><p>Claude Code / Claude Desktop を再起動し、<code>vroid_status</code> を呼びます。</p></div></li></ol><div class="install-details" data-reveal><h3>リンク</h3><p><a href="https://github.com/mcjo79/vroid-mcp/blob/main/README.md">README</a> · <a href="https://github.com/mcjo79/vroid-mcp/blob/main/docs/REFERENCE.md">MCP reference</a> · <a href="https://github.com/mcjo79/vroid-mcp/releases/latest">Releases</a></p><p>MIT ライセンス。ツール名と引数は英語です。</p></div></div></div></section>
   </main>
   <footer class="site-footer"><div class="container footer-grid"><div class="footer-brand"><p>VRoid MCP Bridge</p><p>v0.11.0 · MIT</p></div><nav class="footer-col"><a href="https://github.com/mcjo79/vroid-mcp">GitHub</a><a href="https://github.com/mcjo79/vroid-mcp/releases/latest">ダウンロード</a><a href="https://github.com/mcjo79/vroid-mcp/blob/main/README.md">ドキュメント</a></nav><nav class="footer-col"><a href="../privacy/">プライバシー (EN)</a><a href="https://github.com/mcjo79/vroid-mcp/blob/main/LICENSE">MIT</a></nav><div class="footer-col"><p class="footer-status"><span class="status-dot"></span>v0.11.0 · public</p></div></div></footer>
   <script src="../assets/js/main.js" defer></script>

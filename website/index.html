@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <title>VRoid MCP Bridge — Drive VRoid Studio from AI</title>
-  <meta name="description" content="Local MCP bridge between Claude Code, Claude Desktop (or any MCP client) and VRoid Studio: 52 tools for parameters, textures, hair, presets, camera and captures. Character test built from a prompt with DeepSeek, no reference image.">
+  <title>VRoid MCP Bridge — Create VRoid characters in batches</title>
+  <meta name="description" content="Create VRoid character variants in batches with Claude: drive VRoid Studio, change presets, textures and colors, and export VRM without clicking. 52 MCP tools, undoable, installed in minutes.">
   <meta name="author" content="mcjo79">
   <link rel="canonical" href="https://mcjo79.github.io/vroid-mcp/">
   <link rel="alternate" hreflang="en" href="https://mcjo79.github.io/vroid-mcp/">
@@ -18,16 +18,16 @@
   <meta property="og:locale" content="en_US">
   <meta property="og:locale:alternate" content="fr_FR">
   <meta property="og:site_name" content="VRoid MCP Bridge">
-  <meta property="og:title" content="VRoid MCP Bridge — Drive VRoid Studio from AI">
-  <meta property="og:description" content="52 MCP tools to read and edit the model open in VRoid Studio: parameters, textures, hair, presets, camera. Character test built from a prompt with DeepSeek.">
+  <meta property="og:title" content="VRoid MCP Bridge — Create VRoid characters in batches">
+  <meta property="og:description" content="Create VRoid character variants in batches with Claude. Presets, textures, colors and native VRM export — 52 MCP tools, undoable.">
   <meta property="og:url" content="https://mcjo79.github.io/vroid-mcp/">
   <meta property="og:image" content="https://mcjo79.github.io/vroid-mcp/assets/img/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="VRoid MCP Bridge: a young Japanese businesswoman with purple hair and a dark green suit, created with the MCP bridge.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="VRoid MCP Bridge — Drive VRoid Studio from AI">
-  <meta name="twitter:description" content="52 MCP tools to edit the model open in VRoid Studio. Character test built from a prompt with DeepSeek.">
+  <meta name="twitter:title" content="VRoid MCP Bridge — Create VRoid characters in batches">
+  <meta name="twitter:description" content="Create VRoid character variants in batches with Claude. 52 MCP tools, native VRM export, undoable edits.">
   <meta name="twitter:image" content="https://mcjo79.github.io/vroid-mcp/assets/img/og-image.jpg">
 
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
@@ -86,13 +86,13 @@
         <span class="brand-text">VRoid <b>MCP</b><small>Bridge</small></span>
       </a>
 
-      <nav class="nav" id="nav" aria-label="Main navigation">
-        <a href="#apercu">Overview</a>
-        <a href="#test">The test</a>
+      <nav class="nav" id="nav" aria-label="Navigation">
+        <a href="#usecases">Use cases</a>
+        <a href="#batch">Batch</a>
         <a href="#fonctions">Features</a>
+        <a href="#apercu">How it works</a>
         <a href="#outils">Tools</a>
         <a href="#installation">Install</a>
-        <a href="#coulisses">Under the hood</a>
         <a href="#faq">FAQ</a>
       </nav>
 
@@ -124,18 +124,11 @@
       <div class="container hero-grid">
         <div class="hero-copy">
           <p class="eyebrow"><span class="eyebrow-dot"></span>Open source · Windows · VRoid 2.14</p>
-          <h1>Drive <span class="hl">VRoid Studio</span> from AI.</h1>
-          <p class="lede">
-            A local MCP bridge that gives Claude Code, Claude Desktop, DeepSeek — or any MCP client — VRoid's commands:
-            parameters, textures, hair, presets, camera. Every change goes through VRoid's history and can be undone
-            with <kbd>Ctrl</kbd>+<kbd>Z</kbd>.
-          </p>
+          <h1>Create <span class="hl">VRoid characters</span> in batches.</h1>
+          <p class="lede">Build, dress, texture and export VRoid character variants from Claude — without clicking through the editor. Undoable, scriptable, and installed in minutes. Works with Claude Code, Claude Desktop, or any MCP client; no protocol knowledge required.</p>
           <div class="hero-cta">
-            <a class="btn btn-primary" href="https://github.com/mcjo79/vroid-mcp/releases/latest" target="_blank" rel="noopener">
-              Download v0.11.0
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg>
-            </a>
-            <a class="btn btn-secondary" href="#outils">Explore the 52 tools</a>
+            <a class="btn btn-primary" href="#batch">See a batch example</a>
+            <a class="btn btn-secondary" href="https://github.com/mcjo79/vroid-mcp/releases/latest">Download v0.11.0</a>
           </div>
           <ul class="hero-meta" aria-label="Compatibility">
             <li><span class="status-dot"></span>BepInEx 6 · IL2CPP</li>
@@ -152,7 +145,7 @@
           <div class="hero-chips" aria-hidden="true">
             <span>155 cm</span><span>purple hair</span><span>dark green suit</span>
           </div>
-          <figcaption>End-to-end test: a character built entirely with the MCP tools, from a prompt.</figcaption>
+          <figcaption>Example output: one character built with the same tools.</figcaption>
         </figure>
       </div>
 
@@ -166,102 +159,51 @@
       </div>
     </section>
 
-    <section class="section" id="apercu">
-      <div class="container">
-        <header class="section-head" data-reveal>
-          <p class="eyebrow"><span class="eyebrow-num">01</span>The bridge</p>
-          <h2>A short, local chain at the heart of VRoid.</h2>
-          <p class="lede">
-            The MCP server doesn't edit VRoid's files. It translates MCP calls into VRoid's internal commands, exactly
-            as the UI would: changes show up in the history and behave like manual adjustments.
-          </p>
-        </header>
+    <section class="section" id="usecases">
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <p class="eyebrow"><span class="eyebrow-num">01</span>Use cases</p>
+      <h2>Built for creators, not for demos.</h2>
+      <p class="lede">Three concrete ways to use the bridge. Each one starts from a base model and repeats a recipe, instead of rebuilding every variant by hand.</p>
+    </header>
+    <div class="features">
+<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">◈</span><h3>VRChat worlds</h3><p>Populate a world with varied NPCs or avatar variants from one base model — same recipe, different presets, hair, colors and outfits.</p></article>
+<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">▧</span><h3>Visual novels & narrative games</h3><p>Build a coherent cast from a character list: faces, hair, outfits and palettes, then export the VRM files.</p></article>
+<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">✦</span><h3>Asset packs / Booth</h3><p>Produce series of characters or outfits with repeatable recipes, instead of rebuilding every variant by hand.</p></article>
+    </div>
+  </div>
+</section>
 
-        <div class="arch-wrap" data-reveal>
-          <div class="arch" role="list" aria-label="Bridge architecture">
-            <div class="arch-node" role="listitem">
-              <span class="arch-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg>
-              </span>
-              <strong>MCP client</strong>
-              <span>Claude Code, Claude Desktop, DeepSeek, any MCP client</span>
-              <code>stdio</code>
-            </div>
-            <div class="arch-arrow" aria-hidden="true"><span>JSON-RPC</span>→</div>
-            <div class="arch-node" role="listitem">
-              <span class="arch-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/><circle cx="12" cy="12" r="3"/></svg>
-              </span>
-              <strong>MCP server</strong>
-              <span><code>vroid_mcp.py</code> — stdlib Python, zero dependencies</span>
-              <code>:7811</code>
-            </div>
-            <div class="arch-arrow" aria-hidden="true"><span>local HTTP</span>→</div>
-            <div class="arch-node" role="listitem">
-              <span class="arch-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 2 3 7v10l9 5 9-5V7Z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg>
-              </span>
-              <strong>BepInEx plugin</strong>
-              <span>Injected into VRoid, listens on loopback only</span>
-              <code>127.0.0.1</code>
-            </div>
-            <div class="arch-arrow" aria-hidden="true"><span>commands</span>→</div>
-            <div class="arch-node arch-node-accent" role="listitem">
-              <span class="arch-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
-              </span>
-              <strong>VRoid Studio</strong>
-              <span><code>VRoidCore.Editing.Context</code> — model, layers, history</span>
-              <code>Ctrl+Z</code>
-            </div>
-          </div>
-        </div>
-
-        <div class="two-col" data-reveal>
-          <div>
-            <h3>What it changes for an AI</h3>
-            <p>
-              The AI no longer needs to simulate clicks or capture the screen to act: it reads groups, sliders and
-              layers, then runs typed commands. It can chain a preset, a texture recolor and a screenshot to check the
-              result.
-            </p>
-            <ul class="check-list">
-              <li>Read groups, parameters, materials and layers.</li>
-              <li>Write through VRoid's commands, so edits are undoable and replayable.</li>
-              <li>Screenshots and camera to visually check each step.</li>
-            </ul>
-          </div>
-          <div>
-            <div class="code-block">
-              <div class="code-head"><span>Claude Code</span><button class="copy-btn" type="button" data-copy>Copy</button></div>
-              <pre><code>claude mcp add vroid -- python <span class="c-path">&lt;path&gt;\mcp_server\vroid_mcp.py</span></code></pre>
-            </div>
-            <div class="code-block">
-              <div class="code-head"><span>claude_desktop_config.json</span><button class="copy-btn" type="button" data-copy>Copy</button></div>
-              <pre><code>{
-  "mcpServers": {
-    "vroid": {
-      "command": "python",
-      "args": ["&lt;path&gt;\\mcp_server\\vroid_mcp.py"]
-    }
-  }
-}</code></pre>
-            </div>
-          </div>
-        </div>
+<section class="section section-alt" id="batch">
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <p class="eyebrow"><span class="eyebrow-num">02</span>Batch example</p>
+      <h2>One recipe, several variants.</h2>
+      <p class="lede">A batch is just a recipe: choose a base, apply a preset, recolor a texture or material, then export. Replace the IDs and paths with your own.</p>
+    </header>
+    <div class="install-grid">
+      <div class="code-block" data-reveal>
+        <div class="code-head"><span>vroid_batch</span><button class="copy-btn" type="button" data-copy>Copy</button></div>
+        <pre><code>vroid_batch operations=[
+  {"tool":"vroid_apply_preset","args":{"id":"&lt;preset-id&gt;"}},
+  {"tool":"vroid_colorize","args":{"group":"&lt;group-id&gt;","r":0.72,"g":0.42,"b":0.35}},
+  {"tool":"vroid_export_vrm","args":{"path":"D:\\out\\npc_01.vrm","delete_transparent":true}}
+]</code></pre>
       </div>
-    </section>
+      <div data-reveal>
+        <ol class="install-steps"><li><div><h3>Choose a base</h3><p>Open a VRoid model and pick the slots you want to vary.</p></div></li><li><div><h3>Apply the recipe</h3><p>Presets, colors, textures, body or camera changes.</p></div></li><li><div><h3>Export the set</h3><p>One VRM per variant, with the same naming pattern.</p></div></li></ol>
+        <p class="lede">Example recipe — not a fixed preset. Outputs depend on your model and VRoid version.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <section class="section section-alt" id="test">
+<section class="section section-alt" id="test">
       <div class="container">
         <header class="section-head" data-reveal>
-          <p class="eyebrow"><span class="eyebrow-num">02</span>The test</p>
-          <h2>A character from A to Z, from a prompt.</h2>
-          <p class="lede">
-            The bridge was developed with Claude Code. The character test and this site were built with
-            <strong>DeepSeek</strong>, driving an independent MCP client; the bridge itself is client-agnostic. No
-            reference image, and no server or plugin code was modified.
-          </p>
+          <p class="eyebrow"><span class="eyebrow-num">03</span>Example output</p>
+          <h2>One character, start to finish.</h2>
+          <p class="lede">This is what a single run produces. A batch repeats the same recipe across a cast, with variations.</p>
         </header>
         <p class="credit-line" data-reveal>Character test &amp; site: <strong>DeepSeek</strong> · Bridge: Claude Code · Works with any MCP client.</p>
 
@@ -361,10 +303,96 @@
       </div>
     </section>
 
-    <section class="section" id="fonctions">
+<section class="section" id="apercu">
       <div class="container">
         <header class="section-head" data-reveal>
-          <p class="eyebrow"><span class="eyebrow-num">03</span>Features</p>
+          <p class="eyebrow"><span class="eyebrow-num">04</span>How it works</p>
+          <h2>A short, local chain at the heart of VRoid.</h2>
+          <p class="lede">
+            The MCP server doesn't edit VRoid's files. It translates MCP calls into VRoid's internal commands, exactly
+            as the UI would: changes show up in the history and behave like manual adjustments.
+          </p>
+        </header>
+
+        <div class="arch-wrap" data-reveal>
+          <div class="arch" role="list" aria-label="Bridge architecture">
+            <div class="arch-node" role="listitem">
+              <span class="arch-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg>
+              </span>
+              <strong>MCP client</strong>
+              <span>Claude Code, Claude Desktop, DeepSeek, any MCP client</span>
+              <code>stdio</code>
+            </div>
+            <div class="arch-arrow" aria-hidden="true"><span>JSON-RPC</span>→</div>
+            <div class="arch-node" role="listitem">
+              <span class="arch-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/><circle cx="12" cy="12" r="3"/></svg>
+              </span>
+              <strong>MCP server</strong>
+              <span><code>vroid_mcp.py</code> — stdlib Python, zero dependencies</span>
+              <code>:7811</code>
+            </div>
+            <div class="arch-arrow" aria-hidden="true"><span>local HTTP</span>→</div>
+            <div class="arch-node" role="listitem">
+              <span class="arch-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 2 3 7v10l9 5 9-5V7Z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg>
+              </span>
+              <strong>BepInEx plugin</strong>
+              <span>Injected into VRoid, listens on loopback only</span>
+              <code>127.0.0.1</code>
+            </div>
+            <div class="arch-arrow" aria-hidden="true"><span>commands</span>→</div>
+            <div class="arch-node arch-node-accent" role="listitem">
+              <span class="arch-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+              </span>
+              <strong>VRoid Studio</strong>
+              <span><code>VRoidCore.Editing.Context</code> — model, layers, history</span>
+              <code>Ctrl+Z</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col" data-reveal>
+          <div>
+            <h3>What it changes for an AI</h3>
+            <p>
+              The AI no longer needs to simulate clicks or capture the screen to act: it reads groups, sliders and
+              layers, then runs typed commands. It can chain a preset, a texture recolor and a screenshot to check the
+              result.
+            </p>
+            <ul class="check-list">
+              <li>Read groups, parameters, materials and layers.</li>
+              <li>Write through VRoid's commands, so edits are undoable and replayable.</li>
+              <li>Screenshots and camera to visually check each step.</li>
+            </ul>
+          </div>
+          <div>
+            <div class="code-block">
+              <div class="code-head"><span>Claude Code</span><button class="copy-btn" type="button" data-copy>Copy</button></div>
+              <pre><code>claude mcp add vroid -- python <span class="c-path">&lt;path&gt;\mcp_server\vroid_mcp.py</span></code></pre>
+            </div>
+            <div class="code-block">
+              <div class="code-head"><span>claude_desktop_config.json</span><button class="copy-btn" type="button" data-copy>Copy</button></div>
+              <pre><code>{
+  "mcpServers": {
+    "vroid": {
+      "command": "python",
+      "args": ["&lt;path&gt;\\mcp_server\\vroid_mcp.py"]
+    }
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+<section class="section" id="fonctions">
+      <div class="container">
+        <header class="section-head" data-reveal>
+          <p class="eyebrow"><span class="eyebrow-num">05</span>Features</p>
           <h2>Everything the UI does, an AI can ask for.</h2>
           <p class="lede">The tools cover body, face, textures, hair, clothes, presets and camera — with a shared cache so you stop re-trying everything.</p>
         </header>
@@ -404,10 +432,10 @@
       </div>
     </section>
 
-    <section class="section section-alt" id="outils">
+<section class="section section-alt" id="outils">
   <div class="container">
     <header class="section-head" data-reveal>
-      <p class="eyebrow"><span class="eyebrow-num">04</span>Tools</p>
+      <p class="eyebrow"><span class="eyebrow-num">06</span>Tools</p>
       <h2>52 tools.</h2>
       <p class="lede">Tool names and arguments are English; this index is generated from the live MCP registry.</p>
     </header>
@@ -529,10 +557,26 @@
     </div>
   </div>
 </section>
-    <section class="section" id="installation">
+
+<section class="section" id="roadmap">
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <p class="eyebrow"><span class="eyebrow-num">07</span>Roadmap</p>
+      <h2>What is shipped, what comes next.</h2>
+      <p class="lede">Clear boundaries: shipped tools, work in progress, and research that is not available yet.</p>
+    </header>
+    <div class="features">
+<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">●</span><p class="eyebrow">Now · Shipped</p><p>52 MCP tools, native VRM export, batch operations, minimized/background mode, four-language help.</p></article>
+<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">◐</span><p class="eyebrow">Next · In progress</p><p>Clothing texture recipes, batch presets, more examples and documentation.</p></article>
+<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">○</span><p class="eyebrow">Research · Not shipped</p><p>ComfyUI texture workflows, a specialized LoRA, and community evaluation. Collaboration welcome — no promises yet.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="installation">
       <div class="container">
         <header class="section-head" data-reveal>
-          <p class="eyebrow"><span class="eyebrow-num">05</span>Install</p>
+          <p class="eyebrow"><span class="eyebrow-num">08</span>Install</p>
           <h2>Three steps, one installer.</h2>
           <p class="lede">Windows, VRoid Studio and Python 3.8+ (PATH). The installer takes care of BepInEx 6, the plugin, the MCP server and the Claude configuration.</p>
         </header>
@@ -589,10 +633,10 @@
       </div>
     </section>
 
-    <section class="section section-alt" id="coulisses">
+<section class="section section-alt" id="coulisses">
       <div class="container">
         <header class="section-head" data-reveal>
-          <p class="eyebrow"><span class="eyebrow-num">06</span>Under the hood</p>
+          <p class="eyebrow"><span class="eyebrow-num">09</span>Under the hood</p>
           <h2>The details that make the difference.</h2>
           <p class="lede">An IL2CPP bridge requires a few precautions. Here are the pitfalls we hit and what we verified.</p>
         </header>
@@ -634,10 +678,10 @@
       </div>
     </section>
 
-    <section class="section" id="faq">
+<section class="section" id="faq">
       <div class="container faq-wrap">
         <header class="section-head" data-reveal>
-          <p class="eyebrow"><span class="eyebrow-num">07</span>FAQ</p>
+          <p class="eyebrow"><span class="eyebrow-num">10</span>FAQ</p>
           <h2>Frequently asked questions.</h2>
         </header>
 
