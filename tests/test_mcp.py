@@ -44,6 +44,35 @@ class ToolMetadataTests(unittest.TestCase):
         self.assertEqual(set(listed), {t["name"] for t in vroid_mcp.TOOLS})
 
 
+class CatalogScanTests(unittest.TestCase):
+    """Le scan du catalogue ne doit jamais vider le cache sur une liste vide."""
+
+    def test_empty_preset_list_is_skipped(self):
+        import unittest.mock as mock
+
+        def fake_bridge(path, **kwargs):
+            if path == "/presets":
+                return {"presets": []}
+            if path == "/status":
+                return {"modelOpen": False, "ready": False, "unity": "6000.0.62f1"}
+            return {"items": []}
+
+        calls = []
+        with mock.patch.object(vroid_mcp, "call_bridge", side_effect=fake_bridge), \
+             mock.patch.object(preset_cache, "scan", side_effect=lambda *a, **k: calls.append(a) or {"total": 0}):
+            res = vroid_mcp.cache_sync()
+
+        self.assertEqual(calls, [], "scan() ne doit pas être appelé sans presets")
+        self.assertIn("skipped", res)
+        self.assertEqual(res["removed"], [])
+
+    def test_maybe_scan_ignores_closed_model(self):
+        import unittest.mock as mock
+        st = {"modelOpen": False, "ready": False, "startedUtc": "sess-1"}
+        with mock.patch.object(vroid_mcp, "call_bridge", return_value=st):
+            self.assertIsNone(vroid_mcp.maybe_scan())
+
+
 class PreviewTests(unittest.TestCase):
     def test_screenshot_exposes_preview_quality_options(self):
         tool = next(t for t in vroid_mcp.TOOLS if t["name"] == "vroid_screenshot")

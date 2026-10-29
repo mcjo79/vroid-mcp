@@ -628,7 +628,14 @@ def cache_sync(icons=False, icon_limit=None):
         customs = call_bridge("/custom_items").get("items", [])
     except Exception:  # plugin antérieur à 0.11
         customs = []
-    res = preset_cache.scan(live["presets"], customs, st.get("unity"), st.get("startedUtc"))
+    items = live.get("presets") if isinstance(live, dict) else None
+    if items is None and isinstance(live, dict):
+        items = live.get("items") or live.get("all")
+    if not items:
+        # Ne jamais scanner une liste vide : cela marquerait tout le cache comme retiré.
+        return {"total": 0, "customs": 0, "new": 0, "changed": [], "removed": [],
+                "skipped": "aucun preset renvoyé par VRoid (modèle non ouvert ?)"}
+    res = preset_cache.scan(items, customs, st.get("unity"), st.get("startedUtc"))
     if icons:
         done = 0
         for e in list(preset_cache.load()["presets"].values()):
@@ -650,6 +657,10 @@ def maybe_scan():
     try:
         st = call_bridge("/status", timeout=5)
     except Exception:
+        return None
+    if not st.get("modelOpen") or not st.get("ready"):
+        # Le catalogue n'est lisible qu'avec un modèle ouvert : sinon VRoid renvoie une liste
+        # vide et le scan conclurait à tort que tous les presets ont été retirés.
         return None
     session = st.get("startedUtc")
     if not session or session == _scan_session:
@@ -1612,7 +1623,7 @@ def handle(msg):
         return {
             "protocolVersion": params.get("protocolVersion", PROTOCOL_VERSION),
             "capabilities": {"tools": {}, "prompts": {}},
-            "serverInfo": {"name": "vroid-studio", "version": "0.11.0"},
+            "serverInfo": {"name": "vroid-studio", "version": "0.12.0"},
             "instructions": help_i18n.INITIALIZE_INSTRUCTIONS,
         }
     if method == "ping":
