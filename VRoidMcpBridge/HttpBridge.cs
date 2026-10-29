@@ -76,9 +76,12 @@ public class HttpBridge
                 if (n != null) return n.GetValue<float>();
                 var s = req.QueryString[name];
                 if (s != null) return float.Parse(s, System.Globalization.CultureInfo.InvariantCulture);
-                if (float.IsNaN(def)) throw new ArgumentException($"paramètre manquant : {name}");
+                if (float.IsNaN(def)) throw new ArgumentException($"missing parameter: {name}");
                 return def;
             }
+
+            bool? B(string name) => Q(name) is { } v ? string.Equals(v, "true", StringComparison.OrdinalIgnoreCase) || v == "1" : null;
+            int? I(string name) => Q(name) is { } v ? (int)Math.Round(double.Parse(v, System.Globalization.CultureInfo.InvariantCulture)) : null;
 
             result = req.Url.AbsolutePath.TrimEnd('/') switch
             {
@@ -119,15 +122,44 @@ public class HttpBridge
                 "/face_blendshapes" => await MainThread.Run(() => FacePreview.List(Q("filter"))),
                 "/face_preview" => await MainThread.Run(() => FacePreview.Set(Q("name"), F("weight", 100f))),
                 "/begin_hair_edit" => await MainThread.Run(() => Hair.BeginEdit(Q("material"))),
-                "/remove_group" => await Presets.Remove(Q("group")),
+                "/context_state" => await MainThread.Run(ContextState.Get),
+                "/create" => await FileLifecycle.Create(Q("gender")),
+                "/open" => await FileLifecycle.Open(Q("path")),
+                "/save" => await FileLifecycle.Save(Q("path")),
+                "/main_menu" => await FileLifecycle.MainMenu(string.Equals(Q("discard"), "true", StringComparison.OrdinalIgnoreCase)),
+                "/vrm_probe" => await MainThread.Run(VrmExportProbe.Info),
+                "/vrm_export_options" => await VrmExport.Options_(),
+                "/vrm_export_leave" => await VrmExport.Leave(),
+                "/vrm_export" => await VrmExport.Export(new VrmExport.Options
+                {
+                    Path = Q("path"),
+                    Version = Q("version") ?? "1",
+                    MeshErasure = B("delete_transparent") ?? true,
+                    HairCrossSection = B("hair_cross_section"),
+                    HairSmoothness = I("hair_smoothness"), Hair = I("hair"), Face = I("face"), Body = I("body"), Outfit = I("outfit"),
+                    MaterialMode = I("material_mode"), AtlasResolution = I("atlas_resolution"),
+                    CombineHair = B("combine_hair"), TextureMode = I("texture_mode"), HairBones = I("hair_bones"),
+                    Title = Q("title"), Author = Q("author"), ModelVersion = Q("model_version"),
+                    Leave = B("leave") ?? true,
+                    TimeoutSec = I("timeout") ?? 600,
+                }),
+                "/exit" => await FileLifecycle.Quit(string.Equals(Q("discard"), "true", StringComparison.OrdinalIgnoreCase)),
+                "/load_group" => await ContextState.Guarded(() => Presets.LoadGroup(Q("id"))),
+                "/apply_custom" => await ContextState.Guarded(() => CustomItems.Apply(Q("file"))),
+                "/remove_group" => await ContextState.Guarded(() => Presets.Remove(Q("group"))),
+                "/custom_items" => await MainThread.Run(Catalog.CustomItems),
+                "/preset_thumbnail" => await MainThread.Run(() => Catalog.PresetThumbnail(Q("resource"), Q("path"))),
                 "/presets" => await MainThread.Run(() => Presets.List(Q("filter"),
                     string.Equals(Q("include_locked"), "true", StringComparison.OrdinalIgnoreCase), (int)F("limit", 200))),
-                "/apply_preset" => await Presets.Apply(Q("id"),
-                    string.Equals(Q("preserve_material"), "true", StringComparison.OrdinalIgnoreCase)),
+                "/apply_preset" => await ContextState.Guarded(() => Presets.Apply(Q("id"),
+                    string.Equals(Q("preserve_material"), "true", StringComparison.OrdinalIgnoreCase))),
                 "/undo" => await VRoidApi.Undo(),
                 "/redo" => await VRoidApi.Redo(),
-                "/screenshot" => await VRoidApi.Screenshot(Q("path")),
-                _ => throw new FileNotFoundException("route inconnue"),
+                "/screenshot" => await VRoidApi.Screenshot(Q("path"),
+                    (int)F("width", 0), (int)F("height", 0),
+                    (int)F("msaa", 4), (int)F("ssaa", 2),
+                    !string.Equals(Q("clean"), "false", StringComparison.OrdinalIgnoreCase)),
+                _ => throw new FileNotFoundException("unknown route"),
             };
         }
         catch (Exception e)

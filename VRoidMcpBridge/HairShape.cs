@@ -140,7 +140,7 @@ public static class HairShape
         var created = new GetHairGroupListQuery(transferable).Execute(model)
             .Where(g => g != null).Select(g => g.TryCast<BrushHairGroupPath>())
             .FirstOrDefault(g => g != null && !before.Contains(g.HairGroupId));
-        if (created == null) return new { ok = false, message = "copie introuvable après duplication" };
+        if (created == null) return new { ok = false, message = "copy not found after duplication" };
         int moved = 0;
         var off = new Vector3(dx, dy, dz);
         if (off != Vector3.zero)

@@ -15,7 +15,7 @@ public static class CameraView
         AvatarCameraPosition best = null;
         foreach (var c in UnityEngine.Object.FindObjectsOfType<AvatarCameraPosition>())
             if (c.isActiveAndEnabled) { best = c; break; }
-        return best ?? throw new InvalidOperationException("caméra de la vue 3D introuvable");
+        return best ?? throw new InvalidOperationException("VRoid 3D camera not found");
     }
 
     static object State(AvatarCameraPosition c)
@@ -55,14 +55,14 @@ public static class CameraView
             case "projection": c.SwitchCameraProjection(); break;
             case "mode":
                 if (!Enum.TryParse<AvatarCameraPosition.CameraRotationMode>(mode, true, out var m))
-                    throw new ArgumentException($"mode inconnu : {mode} (voir rotationModes)");
+                    throw new ArgumentException($"unknown rotation mode: {mode} (see rotationModes)");
                 c.RotateAxis(m);
                 break;
             case "custom":
                 c.SetCustomView(new Vector3(f("px", float.NaN), f("py", float.NaN), f("pz", float.NaN)),
                     new Vector3(f("cx", float.NaN), f("cy", float.NaN), f("cz", float.NaN)));
                 break;
-            default: throw new ArgumentException($"action inconnue : {action}");
+            default: throw new ArgumentException($"unknown camera action: {action}");
         }
         return State(c);
     }

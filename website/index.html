@@ -1,0 +1,747 @@
+<!doctype html>
+<html lang="en" class="no-js" data-privacy="privacy/">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>VRoid MCP Bridge — Drive VRoid Studio from AI</title>
+  <meta name="description" content="Local MCP bridge between Claude Code, Claude Desktop (or any MCP client) and VRoid Studio: 52 tools for parameters, textures, hair, presets, camera and captures. Character test built from a prompt with DeepSeek, no reference image.">
+  <meta name="author" content="mcjo79">
+  <link rel="canonical" href="https://mcjo79.github.io/vroid-mcp/">
+  <link rel="alternate" hreflang="en" href="https://mcjo79.github.io/vroid-mcp/">
+  <link rel="alternate" hreflang="fr" href="https://mcjo79.github.io/vroid-mcp/fr/">
+  <link rel="alternate" hreflang="ja" href="https://mcjo79.github.io/vroid-mcp/ja/">
+  <link rel="alternate" hreflang="zh" href="https://mcjo79.github.io/vroid-mcp/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://mcjo79.github.io/vroid-mcp/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="fr_FR">
+  <meta property="og:site_name" content="VRoid MCP Bridge">
+  <meta property="og:title" content="VRoid MCP Bridge — Drive VRoid Studio from AI">
+  <meta property="og:description" content="52 MCP tools to read and edit the model open in VRoid Studio: parameters, textures, hair, presets, camera. Character test built from a prompt with DeepSeek.">
+  <meta property="og:url" content="https://mcjo79.github.io/vroid-mcp/">
+  <meta property="og:image" content="https://mcjo79.github.io/vroid-mcp/assets/img/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="VRoid MCP Bridge: a young Japanese businesswoman with purple hair and a dark green suit, created with the MCP bridge.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="VRoid MCP Bridge — Drive VRoid Studio from AI">
+  <meta name="twitter:description" content="52 MCP tools to edit the model open in VRoid Studio. Character test built from a prompt with DeepSeek.">
+  <meta name="twitter:image" content="https://mcjo79.github.io/vroid-mcp/assets/img/og-image.jpg">
+
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="theme-color" content="#f7f3ea" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#12110f" media="(prefers-color-scheme: dark)">
+
+  <link rel="preload" as="image" href="assets/img/hero.jpg" fetchpriority="high">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/gtag-init.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2NDE82V29F"></script>
+  <script src="assets/js/consent.js" defer></script>
+
+  <script>
+    (function () {
+      var root = document.documentElement;
+      try {
+        var saved = localStorage.getItem('vroid-theme');
+        if (saved === 'dark' || saved === 'light') root.dataset.theme = saved;
+        else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) root.dataset.theme = 'dark';
+      } catch (e) {}
+      root.classList.remove('no-js');
+      root.classList.add('js');
+    })();
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "VRoid MCP Bridge",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Windows",
+    "description": "Local MCP bridge to read and edit the model open in VRoid Studio from an AI.",
+    "url": "https://mcjo79.github.io/vroid-mcp/",
+    "codeRepository": "https://github.com/mcjo79/vroid-mcp",
+    "softwareVersion": "0.11.0",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+    "license": "https://github.com/mcjo79/vroid-mcp"
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#contenu">Skip to content</a>
+  <div class="scroll-progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="#top" aria-label="VRoid MCP Bridge, back to top">
+        <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" rx="16" fill="currentColor"/>
+          <path d="M16 18 L32 46 L48 18" fill="none" stroke="#F0C23A" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="49" cy="16" r="6" fill="#B02A37"/>
+        </svg>
+        <span class="brand-text">VRoid <b>MCP</b><small>Bridge</small></span>
+      </a>
+
+      <nav class="nav" id="nav" aria-label="Main navigation">
+        <a href="#apercu">Overview</a>
+        <a href="#test">The test</a>
+        <a href="#fonctions">Features</a>
+        <a href="#outils">Tools</a>
+        <a href="#installation">Install</a>
+        <a href="#coulisses">Under the hood</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <div class="header-actions">
+        <div class="lang-switch" role="group" aria-label="Language">
+          <a href="./" hreflang="en" lang="en" aria-current="true">EN</a>
+          <a href="fr/" hreflang="fr" lang="fr">FR</a>
+          <a href="ja/" hreflang="ja" lang="ja">JA</a>
+          <a href="zh/" hreflang="zh" lang="zh-CN">ZH</a>
+        </div>
+        <button class="icon-btn theme-toggle" id="themeToggle" type="button" aria-label="Switch theme" aria-pressed="false">
+          <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8Z"/></svg>
+        </button>
+        <a class="btn btn-small btn-ghost header-github" href="https://github.com/mcjo79/vroid-mcp" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 1.7 2.6 1.2 3.2.9.1-.7.4-1.2.7-1.5-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .4.2.7.8.6A11.5 11.5 0 0 0 12 .5Z"/></svg>
+          <span>GitHub</span>
+        </a>
+        <button class="icon-btn menu-toggle" id="menuToggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="contenu">
+    <section class="hero">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-dot"></span>Open source · Windows · VRoid 2.14</p>
+          <h1>Drive <span class="hl">VRoid Studio</span> from AI.</h1>
+          <p class="lede">
+            A local MCP bridge that gives Claude Code, Claude Desktop, DeepSeek — or any MCP client — VRoid's commands:
+            parameters, textures, hair, presets, camera. Every change goes through VRoid's history and can be undone
+            with <kbd>Ctrl</kbd>+<kbd>Z</kbd>.
+          </p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="https://github.com/mcjo79/vroid-mcp/releases/latest" target="_blank" rel="noopener">
+              Download v0.11.0
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg>
+            </a>
+            <a class="btn btn-secondary" href="#outils">Explore the 52 tools</a>
+          </div>
+          <ul class="hero-meta" aria-label="Compatibility">
+            <li><span class="status-dot"></span>BepInEx 6 · IL2CPP</li>
+            <li>Python 3.8+ (PATH)</li>
+            <li>127.0.0.1:7811</li>
+          </ul>
+        </div>
+
+        <figure class="hero-visual" data-reveal>
+          <div class="hero-card">
+            <span class="hero-tag">Made through the bridge</span>
+            <img src="assets/img/hero.jpg" alt="Young Japanese businesswoman with purple hair and a dark green suit, created in VRoid with the MCP bridge." width="760" height="1131" fetchpriority="high">
+          </div>
+          <div class="hero-chips" aria-hidden="true">
+            <span>155 cm</span><span>purple hair</span><span>dark green suit</span>
+          </div>
+          <figcaption>End-to-end test: a character built entirely with the MCP tools, from a prompt.</figcaption>
+        </figure>
+      </div>
+
+      <div class="container">
+        <dl class="stats" data-reveal>
+          <div><dt>MCP tools</dt><dd>52</dd></div>
+          <div><dt>VRoid presets</dt><dd>1,750</dd></div>
+          <div><dt>Categories</dt><dd>50</dd></div>
+          <div><dt>Server dependencies</dt><dd>0</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="section" id="apercu">
+      <div class="container">
+        <header class="section-head" data-reveal>
+          <p class="eyebrow"><span class="eyebrow-num">01</span>The bridge</p>
+          <h2>A short, local chain at the heart of VRoid.</h2>
+          <p class="lede">
+            The MCP server doesn't edit VRoid's files. It translates MCP calls into VRoid's internal commands, exactly
+            as the UI would: changes show up in the history and behave like manual adjustments.
+          </p>
+        </header>
+
+        <div class="arch-wrap" data-reveal>
+          <div class="arch" role="list" aria-label="Bridge architecture">
+            <div class="arch-node" role="listitem">
+              <span class="arch-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg>
+              </span>
+              <strong>MCP client</strong>
+              <span>Claude Code, Claude Desktop, DeepSeek, any MCP client</span>
+              <code>stdio</code>
+            </div>
+            <div class="arch-arrow" aria-hidden="true"><span>JSON-RPC</span>→</div>
+            <div class="arch-node" role="listitem">
+              <span class="arch-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/><circle cx="12" cy="12" r="3"/></svg>
+              </span>
+              <strong>MCP server</strong>
+              <span><code>vroid_mcp.py</code> — stdlib Python, zero dependencies</span>
+              <code>:7811</code>
+            </div>
+            <div class="arch-arrow" aria-hidden="true"><span>local HTTP</span>→</div>
+            <div class="arch-node" role="listitem">
+              <span class="arch-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 2 3 7v10l9 5 9-5V7Z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg>
+              </span>
+              <strong>BepInEx plugin</strong>
+              <span>Injected into VRoid, listens on loopback only</span>
+              <code>127.0.0.1</code>
+            </div>
+            <div class="arch-arrow" aria-hidden="true"><span>commands</span>→</div>
+            <div class="arch-node arch-node-accent" role="listitem">
+              <span class="arch-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+              </span>
+              <strong>VRoid Studio</strong>
+              <span><code>VRoidCore.Editing.Context</code> — model, layers, history</span>
+              <code>Ctrl+Z</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col" data-reveal>
+          <div>
+            <h3>What it changes for an AI</h3>
+            <p>
+              The AI no longer needs to simulate clicks or capture the screen to act: it reads groups, sliders and
+              layers, then runs typed commands. It can chain a preset, a texture recolor and a screenshot to check the
+              result.
+            </p>
+            <ul class="check-list">
+              <li>Read groups, parameters, materials and layers.</li>
+              <li>Write through VRoid's commands, so edits are undoable and replayable.</li>
+              <li>Screenshots and camera to visually check each step.</li>
+            </ul>
+          </div>
+          <div>
+            <div class="code-block">
+              <div class="code-head"><span>Claude Code</span><button class="copy-btn" type="button" data-copy>Copy</button></div>
+              <pre><code>claude mcp add vroid -- python <span class="c-path">&lt;path&gt;\mcp_server\vroid_mcp.py</span></code></pre>
+            </div>
+            <div class="code-block">
+              <div class="code-head"><span>claude_desktop_config.json</span><button class="copy-btn" type="button" data-copy>Copy</button></div>
+              <pre><code>{
+  "mcpServers": {
+    "vroid": {
+      "command": "python",
+      "args": ["&lt;path&gt;\\mcp_server\\vroid_mcp.py"]
+    }
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="test">
+      <div class="container">
+        <header class="section-head" data-reveal>
+          <p class="eyebrow"><span class="eyebrow-num">02</span>The test</p>
+          <h2>A character from A to Z, from a prompt.</h2>
+          <p class="lede">
+            The bridge was developed with Claude Code. The character test and this site were built with
+            <strong>DeepSeek</strong>, driving an independent MCP client; the bridge itself is client-agnostic. No
+            reference image, and no server or plugin code was modified.
+          </p>
+        </header>
+        <p class="credit-line" data-reveal>Character test &amp; site: <strong>DeepSeek</strong> · Bridge: Claude Code · Works with any MCP client.</p>
+
+        <div class="brief" data-reveal>
+          <div class="brief-card">
+            <span class="compare-label">Brief — English</span>
+            <blockquote>“Young Japanese businesswoman, purple hair, 155 cm, dark green suit.”</blockquote>
+            <p class="brief-note">Translated from the French brief. No reference image: the character is built entirely in VRoid.</p>
+            <ul class="brief-facts">
+              <li><strong>155</strong><span>cm</span></li>
+              <li><strong>Purple</strong><span>hair</span></li>
+              <li><strong>Dark green</strong><span>suit</span></li>
+            </ul>
+            <a class="brief-link" href="https://github.com/mcjo79/vroid-mcp/blob/main/docs/CHARACTER_PROMPT.md" target="_blank" rel="noopener">Read the brief in the docs <span aria-hidden="true">↗</span></a>
+          </div>
+          <figure class="brief-result">
+            <span class="compare-label compare-label-accent">VRoid result</span>
+            <div class="compare-media"><img src="assets/img/hero-side.jpg" loading="eager" alt="3/4 view of the young Japanese businesswoman with purple hair and a dark green suit." width="760" height="1238"></div>
+            <figcaption>3/4 view · 155 cm · purple hair · dark green suit.</figcaption>
+          </figure>
+        </div>
+
+        <ol class="timeline" data-reveal>
+          <li>
+            <span class="step">01</span>
+            <div>
+              <h3>Brief &amp; base</h3>
+              <p>N00 model, feminine silhouette set to 155 cm. No reference image: everything starts from the sentence.</p>
+            </div>
+          </li>
+          <li>
+            <span class="step">02</span>
+            <div>
+              <h3>Hair</h3>
+              <p>Preset 001 (long straight, side part), switched to texture editing and recolored purple — texture and scalp.</p>
+            </div>
+          </li>
+          <li>
+            <span class="step">03</span>
+            <div>
+              <h3>Suit</h3>
+              <p>Default clothes removed, blazer + shirt, dark green trousers, pumps. The beige blazer is repainted forest green without touching the shirt.</p>
+            </div>
+          </li>
+          <li>
+            <span class="step">04</span>
+            <div>
+              <h3>Face &amp; render</h3>
+              <p>FaceSet 002, blush, lips and brows, then camera and captures to validate each step.</p>
+            </div>
+          </li>
+        </ol>
+
+        <p class="inline-link" data-reveal>
+          <a href="assets/img/hair-presets.jpg" data-lightbox data-caption="All 37 complete hairstyles in the preset cache, with preset 001 highlighted.">See the full sheet of 37 hairstyles <span aria-hidden="true">↗</span></a>
+        </p>
+
+        <div class="gallery" data-reveal>
+          <a class="gallery-item gallery-sheet" href="assets/img/hair-presets.jpg" data-lightbox data-caption="All 37 complete hairstyles; preset 001 (side part) was selected.">
+            <img src="assets/img/hair-presets.jpg" alt="Contact sheet of 37 VRoid hairstyles, with preset 001 highlighted." width="1050" height="2374" loading="lazy">
+            <span class="gallery-cap"><strong>37 hairstyles</strong><small>Full sheet, preset 001 highlighted.</small></span>
+          </a>
+          <a class="gallery-item" href="assets/img/hair-purple.jpg" data-lightbox data-caption="Hair step: preset 001 recolored purple, before the suit.">
+            <img src="assets/img/hair-purple.jpg" alt="Character with purple hair, before the suit is applied." width="620" height="955" loading="lazy">
+            <span class="gallery-cap"><strong>Purple hair</strong><small>Preset 001, recolored texture.</small></span>
+          </a>
+          <a class="gallery-item" href="assets/img/suit-raw.jpg" data-lightbox data-caption="Suit step: beige blazer and white shirt, before recoloring.">
+            <img src="assets/img/suit-raw.jpg" alt="Beige suit with a white shirt, before recoloring." width="620" height="955" loading="lazy">
+            <span class="gallery-cap"><strong>Raw suit</strong><small>Beige blazer and white shirt.</small></span>
+          </a>
+          <a class="gallery-item" href="assets/img/suit-green.jpg" data-lightbox data-caption="The beige blazer is repainted forest green; the shirt stays white.">
+            <img src="assets/img/suit-green.jpg" alt="Dark green suit with a white shirt." width="620" height="955" loading="lazy">
+            <span class="gallery-cap"><strong>Green suit</strong><small>Beige repainted forest green.</small></span>
+          </a>
+          <a class="gallery-item" href="assets/img/face.jpg" data-lightbox data-caption="Face: FaceSet 002, blush, lips and purple brows.">
+            <img src="assets/img/face.jpg" alt="Close-up of the face with brown eyes, purple hair and blush." width="620" height="717" loading="lazy">
+            <span class="gallery-cap"><strong>Face</strong><small>FaceSet, blush and lips.</small></span>
+          </a>
+          <a class="gallery-item is-doc" href="assets/img/suit-texture.jpg" data-lightbox data-caption="Blazer texture: beige becomes green, the shirt and gold buttons are preserved.">
+            <img src="assets/img/suit-texture.jpg" alt="Blazer texture recolored forest green." width="760" height="760" loading="lazy">
+            <span class="gallery-cap"><strong>Blazer texture</strong><small>Beige → green, shirt preserved.</small></span>
+          </a>
+        </div>
+
+        <aside class="caveat" data-reveal>
+          <div class="caveat-icon" aria-hidden="true">!</div>
+          <div>
+            <h3>What the test taught us</h3>
+            <ul>
+              <li>Hair color under the hair is set on the scalp (<code>Level1BaseHair_OverlayColor</code>) <em>and</em> on the preset texture, after <code>vroid_begin_hair_edit</code>.</li>
+              <li>A preset blazer can be selectively recolored: beige becomes forest green, the white shirt and gold buttons stay intact.</li>
+              <li>Default clothes must be removed with <code>vroid_remove_item</code> before applying an outfit, otherwise layers stack.</li>
+              <li>The bridge doesn't change the pose: the model stays in T-pose, as in VRoid. The camera is set with <code>vroid_camera</code>.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="fonctions">
+      <div class="container">
+        <header class="section-head" data-reveal>
+          <p class="eyebrow"><span class="eyebrow-num">03</span>Features</p>
+          <h2>Everything the UI does, an AI can ask for.</h2>
+          <p class="lede">The tools cover body, face, textures, hair, clothes, presets and camera — with a shared cache so you stop re-trying everything.</p>
+        </header>
+
+        <div class="features">
+          <article class="feature" data-reveal>
+            <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="18" r="2"/></svg></span>
+            <h3>Parameters &amp; silhouette</h3>
+            <p>Shape and bone sliders, colors, target height and weight. Paired <code>Mag</code>/<code>Shrink</code> sliders are handled server-side.</p>
+          </article>
+          <article class="feature" data-reveal>
+            <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5Z"/><path d="m3 12 9 5 9-5M3 17l9 5 9-5"/></svg></span>
+            <h3>Textures &amp; layers</h3>
+            <p>List, export as PNG, edit, re-import, recolor or add a layer. Transparency and folds are preserved.</p>
+          </article>
+          <article class="feature" data-reveal>
+            <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20c4-2 6-6 8-10s4-6 8-6"/><path d="M4 20c2-6 6-10 12-12"/><circle cx="5" cy="19" r="2"/></svg></span>
+            <h3>Hair</h3>
+            <p>Materials, colors, procedural group length, brush strand lengthening and cloning.</p>
+          </article>
+          <article class="feature" data-reveal>
+            <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+            <h3>Presets</h3>
+            <p>1,750 presets, 50 categories, including sub-parts (bangs, back hair, lips, ears…). Apply, remove, edit.</p>
+          </article>
+          <article class="feature" data-reveal>
+            <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h3l2-3h6l2 3h3v13H4Z"/><circle cx="12" cy="13" r="4"/></svg></span>
+            <h3>Camera &amp; captures</h3>
+            <p>Angles, zoom, pan, orthographic projection, preset views, screenshots and expression preview.</p>
+          </article>
+          <article class="feature" data-reveal>
+            <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg></span>
+            <h3>Preset cache</h3>
+            <p>A local catalog shared between AIs: thumbnails, descriptions, tags and colors, synced without losing annotations.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="outils">
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <p class="eyebrow"><span class="eyebrow-num">04</span>Tools</p>
+      <h2>52 tools.</h2>
+      <p class="lede">Tool names and arguments are English; this index is generated from the live MCP registry.</p>
+    </header>
+    <div class="tools-toolbar" data-reveal>
+      <label class="search" for="toolSearch">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+        <input id="toolSearch" type="search" placeholder="Filter: texture, hair, preset, VRM…" autocomplete="off">
+      </label>
+      <p class="tools-count" id="toolsCount" aria-live="polite">52 tools</p>
+    </div>
+    <div class="tools" id="tools" data-reveal>
+      <details class="tool-group" open>
+        <summary><span>Start</span><span class="tool-badge">2</span></summary>
+        <table><thead><tr><th scope="col">Tool</th><th scope="col">Purpose</th></tr></thead><tbody>
+          <tr data-tool="vroid_help Show the built-in manual. Topics: overview, tools, lifecycle, export, framing, thumbnails, colors,"><td><code>vroid_help</code></td><td>Show the built-in manual. Topics: overview, tools, lifecycle, export, framing, thumbnails, colors, outfit, sessions, errors, languages, batch. lang=e…</td></tr>
+          <tr data-tool="vroid_status Report whether VRoid Studio responds, whether a model is open, its current"><td><code>vroid_status</code></td><td>Report whether VRoid Studio responds, whether a model is open, its current file, whether it has unsaved changes (dirty) and whether the editor is rea…</td></tr>
+        </tbody></table>
+      </details>
+      <details class="tool-group">
+        <summary><span>Lifecycle</span><span class="tool-badge">5</span></summary>
+        <table><thead><tr><th scope="col">Tool</th><th scope="col">Purpose</th></tr></thead><tbody>
+          <tr data-tool="vroid_create Create a new model from the VRoid template (female or male), like"><td><code>vroid_create</code></td><td>Create a new model from the VRoid template (female or male), like the Create New Model dialog. VRoid must be at the model-select screen (no model ope…</td></tr>
+          <tr data-tool="vroid_open Open a .vroid file and wait until the model is ready. VRoid"><td><code>vroid_open</code></td><td>Open a .vroid file and wait until the model is ready. VRoid must be at the model-select screen (no model open): save and call vroid_main_menu first i…</td></tr>
+          <tr data-tool="vroid_save Save the open model. With path: Save As (creates the file). Without"><td><code>vroid_save</code></td><td>Save the open model. With path: Save As (creates the file). Without path: save in place, only if the model already has a .vroid file. A model created…</td></tr>
+          <tr data-tool="vroid_main_menu Return to the model-select screen without quitting VRoid, so another model can"><td><code>vroid_main_menu</code></td><td>Return to the model-select screen without quitting VRoid, so another model can be opened or created. Refuses when there are unsaved changes unless di…</td></tr>
+          <tr data-tool="vroid_exit Quit VRoid Studio gracefully. Refuses unsaved changes unless discard=true. The response is"><td><code>vroid_exit</code></td><td>Quit VRoid Studio gracefully. Refuses unsaved changes unless discard=true. The response is sent before the process exits; use it after a generation s…</td></tr>
+        </tbody></table>
+      </details>
+      <details class="tool-group">
+        <summary><span>VRM export</span><span class="tool-badge">2</span></summary>
+        <table><thead><tr><th scope="col">Tool</th><th scope="col">Purpose</th></tr></thead><tbody>
+          <tr data-tool="vroid_export_vrm Export the open model as a .vrm file with VRoid&#x27;s own exporter,"><td><code>vroid_export_vrm</code></td><td>Export the open model as a .vrm file with VRoid's own exporter, without clicks or file dialog (same options as the 'Export as VRM' screen). Options l…</td></tr>
+          <tr data-tool="vroid_export_vrm_options Open VRoid&#x27;s export screen and return its current export settings and the"><td><code>vroid_export_vrm_options</code></td><td>Open VRoid's export screen and return its current export settings and the available material / texture / atlas choices. Close it again with vroid_exp…</td></tr>
+        </tbody></table>
+      </details>
+      <details class="tool-group">
+        <summary><span>Framing</span><span class="tool-badge">3</span></summary>
+        <table><thead><tr><th scope="col">Tool</th><th scope="col">Purpose</th></tr></thead><tbody>
+          <tr data-tool="vroid_framing_get Read thumbnail framing profiles per category/body part (e.g. Clothing/Tops, Clothing/Shoes, Hair, Face,"><td><code>vroid_framing_get</code></td><td>Read thumbnail framing profiles per category/body part (e.g. Clothing/Tops, Clothing/Shoes, Hair, Face, VRoid/ClothingSet), never per individual garm…</td></tr>
+          <tr data-tool="vroid_framing_set Change the framing of a category/body part (e.g. Clothing/Tops, Clothing/Shoes, Hair, Face,"><td><code>vroid_framing_set</code></td><td>Change the framing of a category/body part (e.g. Clothing/Tops, Clothing/Shoes, Hair, Face, VRoid/ClothingSet), never an individual garment: the over…</td></tr>
+          <tr data-tool="vroid_framing_reset Clear framing overrides (all, or one category/body part) and return to the"><td><code>vroid_framing_reset</code></td><td>Clear framing overrides (all, or one category/body part) and return to the committed defaults in config/framing.json. Local overrides live in preset_…</td></tr>
+        </tbody></table>
+      </details>
+      <details class="tool-group">
+        <summary><span>Batch</span><span class="tool-badge">1</span></summary>
+        <table><thead><tr><th scope="col">Tool</th><th scope="col">Purpose</th></tr></thead><tbody>
+          <tr data-tool="vroid_batch Run several vroid_* operations sequentially in one MCP call and return a"><td><code>vroid_batch</code></td><td>Run several vroid_* operations sequentially in one MCP call and return a text summary plus optional images. Up to 200 operations, no nested batches,…</td></tr>
+        </tbody></table>
+      </details>
+      <details class="tool-group">
+        <summary><span>Inspect &amp; edit</span><span class="tool-badge">9</span></summary>
+        <table><thead><tr><th scope="col">Tool</th><th scope="col">Purpose</th></tr></thead><tbody>
+          <tr data-tool="vroid_list_groups List the editable groups of the open model (face, eyes, hair, body,"><td><code>vroid_list_groups</code></td><td>List the editable groups of the open model (face, eyes, hair, body, outfits...). Each group has an id to pass to the other tools.</td></tr>
+          <tr data-tool="vroid_sections List editable sections and their categories (Face, Hairstyle, Body, Outfit, Accessories, Look),"><td><code>vroid_sections</code></td><td>List editable sections and their categories (Face, Hairstyle, Body, Outfit, Accessories, Look), with group counts. High-level companion to vroid_list…</td></tr>
+          <tr data-tool="vroid_categories List categories in a section (or all categories), with category key, label,"><td><code>vroid_categories</code></td><td>List categories in a section (or all categories), with category key, label, section and group count. Use with vroid_enter / vroid_set_param.</td></tr>
+          <tr data-tool="vroid_enter Select a section/category by name and return its group and enriched parameters"><td><code>vroid_enter</code></td><td>Select a section/category by name and return its group and enriched parameters (labels + stable section/category/key paths). Equivalent in spirit to…</td></tr>
+          <tr data-tool="vroid_get_params List the parameters of a group (blendshape sliders, bones, colors) with their"><td><code>vroid_get_params</code></td><td>List the parameters of a group (blendshape sliders, bones, colors) with their current values.</td></tr>
+          <tr data-tool="vroid_set_param Set a parameter by section/category and key or short label; dispatches to"><td><code>vroid_set_param</code></td><td>Set a parameter by section/category and key or short label; dispatches to bone, blendshape or color. Accepts numbers, #RRGGBB or r,g,b for colors. Un…</td></tr>
+          <tr data-tool="vroid_set_blendshape Set a shape slider (blendshape) of a group. Undoable in VRoid (Ctrl+Z)."><td><code>vroid_set_blendshape</code></td><td>Set a shape slider (blendshape) of a group. Undoable in VRoid (Ctrl+Z).</td></tr>
+          <tr data-tool="vroid_set_bone Set a bone transform parameter (body proportions, size...)."><td><code>vroid_set_bone</code></td><td>Set a bone transform parameter (body proportions, size...).</td></tr>
+          <tr data-tool="vroid_set_color Set a color (components 0..1). Undoable in VRoid."><td><code>vroid_set_color</code></td><td>Set a color (components 0..1). Undoable in VRoid.</td></tr>
+        </tbody></table>
+      </details>
+      <details class="tool-group">
+        <summary><span>Textures</span><span class="tool-badge">5</span></summary>
+        <table><thead><tr><th scope="col">Tool</th><th scope="col">Purpose</th></tr></thead><tbody>
+          <tr data-tool="vroid_list_layers List the editable textures of a group (e.g. skirt = Bottoms): items"><td><code>vroid_list_layers</code></td><td>List the editable textures of a group (e.g. skirt = Bottoms): items (transferable), images and layers (node, name, opacity, visibility, blend mode).…</td></tr>
+          <tr data-tool="vroid_colorize Composite color pass: apply one color to both the global/material colors and"><td><code>vroid_colorize</code></td><td>Composite color pass: apply one color to both the global/material colors and the texture layers of a group (clothing or hair). target=global|texture|…</td></tr>
+          <tr data-tool="vroid_recolor_layer Recolor a texture layer in place, preserving transparency; undoable. mode &#x27;multiply&#x27;: light"><td><code>vroid_recolor_layer</code></td><td>Recolor a texture layer in place, preserving transparency; undoable. mode 'multiply': light fabric -&gt; target color while keeping shadows and folds. m…</td></tr>
+          <tr data-tool="vroid_export_layer Export a texture layer as PNG (RGBA) to edit it with another"><td><code>vroid_export_layer</code></td><td>Export a texture layer as PNG (RGBA) to edit it with another tool.</td></tr>
+          <tr data-tool="vroid_import_layer Import a PNG into a layer (same size as the export) or"><td><code>vroid_import_layer</code></td><td>Import a PNG into a layer (same size as the export) or as a new layer. Undoable.</td></tr>
+        </tbody></table>
+      </details>
+      <details class="tool-group">
+        <summary><span>Hair</span><span class="tool-badge">7</span></summary>
+        <table><thead><tr><th scope="col">Tool</th><th scope="col">Purpose</th></tr></thead><tbody>
+          <tr data-tool="vroid_list_hair_materials List hair materials (hair color is not exposed by vroid_get_params): id, name,"><td><code>vroid_list_hair_materials</code></td><td>List hair materials (hair color is not exposed by vroid_get_params): id, name, adjustable colors (key + value) and textures with their layers (transf…</td></tr>
+          <tr data-tool="vroid_set_hair_color Set a color of a hair material (components 0..1). Undoable. &#x27;base:&lt;id&gt;&#x27; keys"><td><code>vroid_set_hair_color</code></td><td>Set a color of a hair material (components 0..1). Undoable. 'base:&lt;id&gt;' keys are the overlay hair tint of a preset: change that key to recolor a pres…</td></tr>
+          <tr data-tool="vroid_list_hair_groups List hair groups: &#x27;procedural&#x27; (adjustable length and strand count) or &#x27;brush&#x27; (drawn"><td><code>vroid_list_hair_groups</code></td><td>List hair groups: 'procedural' (adjustable length and strand count) or 'brush' (drawn strands: strand count, average length).</td></tr>
+          <tr data-tool="vroid_set_procedural_hair Set the length and/or strand count of a procedural hair group. Undoable."><td><code>vroid_set_procedural_hair</code></td><td>Set the length and/or strand count of a procedural hair group. Undoable.</td></tr>
+          <tr data-tool="vroid_scale_brush_hair Lengthen (factor &gt; 1) or shorten (factor &lt; 1) all strands of"><td><code>vroid_scale_brush_hair</code></td><td>Lengthen (factor &gt; 1) or shorten (factor &lt; 1) all strands of a brush hair group from their root. Undoable (one step per point).</td></tr>
+          <tr data-tool="vroid_clone_brush_hair Duplicate a group of brush strands and offset the copy (in meters,"><td><code>vroid_clone_brush_hair</code></td><td>Duplicate a group of brush strands and offset the copy (in meters, model space) to add strands.</td></tr>
+          <tr data-tool="vroid_begin_hair_edit Switch a hair material to texture editing (VRoid&#x27;s Edit button): its texture"><td><code>vroid_begin_hair_edit</code></td><td>Switch a hair material to texture editing (VRoid's Edit button): its texture becomes available to the layer tools. Useful for a preset hairstyle whos…</td></tr>
+        </tbody></table>
+      </details>
+      <details class="tool-group">
+        <summary><span>History &amp; capture</span><span class="tool-badge">3</span></summary>
+        <table><thead><tr><th scope="col">Tool</th><th scope="col">Purpose</th></tr></thead><tbody>
+          <tr data-tool="vroid_undo Undo the last change in VRoid Studio."><td><code>vroid_undo</code></td><td>Undo the last change in VRoid Studio.</td></tr>
+          <tr data-tool="vroid_redo Redo the last undone change."><td><code>vroid_redo</code></td><td>Redo the last undone change.</td></tr>
+          <tr data-tool="vroid_screenshot Capture a clean 3D preview of the avatar (no VRoid UI) and"><td><code>vroid_screenshot</code></td><td>Capture a clean 3D preview of the avatar (no VRoid UI) and return the image. MSAA 4x and SSAA 2x by default; width/height override the output size; c…</td></tr>
+        </tbody></table>
+      </details>
+      <details class="tool-group">
+        <summary><span>Presets &amp; cache</span><span class="tool-badge">11</span></summary>
+        <table><thead><tr><th scope="col">Tool</th><th scope="col">Purpose</th></tr></thead><tbody>
+          <tr data-tool="vroid_list_presets List VRoid presets (hairstyles, faces, outfits, bodies...). filter searches the resource path"><td><code>vroid_list_presets</code></td><td>List VRoid presets (hairstyles, faces, outfits, bodies...). filter searches the resource path (e.g. 'Hair', 'Tops', 'Bottoms', 'Onepiece', 'Shoes', '…</td></tr>
+          <tr data-tool="vroid_apply_preset Apply a preset (replaces the item in the same category, like clicking"><td><code>vroid_apply_preset</code></td><td>Apply a preset (replaces the item in the same category, like clicking its thumbnail). Undoable. Whole-set presets can replace several slots: verify w…</td></tr>
+          <tr data-tool="vroid_clothing_colors List the adjustable colors of a clothing item (same preset): group +"><td><code>vroid_clothing_colors</code></td><td>List the adjustable colors of a clothing item (same preset): group + key to pass to vroid_set_color.</td></tr>
+          <tr data-tool="vroid_begin_clothing_edit Switch a preset clothing item to texture editing (like VRoid&#x27;s Edit button):"><td><code>vroid_begin_clothing_edit</code></td><td>Switch a preset clothing item to texture editing (like VRoid's Edit button): its layers become available to vroid_list_layers / vroid_recolor_layer.…</td></tr>
+          <tr data-tool="vroid_apply_custom Apply one of the user&#x27;s custom items, like clicking it in VRoid&#x27;s"><td><code>vroid_apply_custom</code></td><td>Apply one of the user's custom items, like clicking it in VRoid's Custom tab: replaces the item in the same category. key = cache key (vroid_preset_c…</td></tr>
+          <tr data-tool="vroid_remove_item Remove an item from the model (clothing, accessory, shoes...). group = group"><td><code>vroid_remove_item</code></td><td>Remove an item from the model (clothing, accessory, shoes...). group = group id, or a short type to remove all groups of that type (Tops, Bottoms, On…</td></tr>
+          <tr data-tool="vroid_preset_cache_search Search the shared preset and custom-item cache (no VRoid needed): labels, descriptions,"><td><code>vroid_preset_cache_search</code></td><td>Search the shared preset and custom-item cache (no VRoid needed): labels, descriptions, tags and colors (manual and auto-generated), plus the thumbna…</td></tr>
+          <tr data-tool="vroid_preset_cache_annotate Add or correct the label, description, tags and colors of a preset"><td><code>vroid_preset_cache_annotate</code></td><td>Add or correct the label, description, tags and colors of a preset in the shared cache, for other AIs. A manual label overrides the generated one. Sh…</td></tr>
+          <tr data-tool="vroid_preset_thumbnail Return the thumbnail of a preset or custom item (image) to judge"><td><code>vroid_preset_thumbnail</code></td><td>Return the thumbnail of a preset or custom item (image) to judge it without applying it: situation capture if available, otherwise VRoid's native ico…</td></tr>
+          <tr data-tool="vroid_preset_cache_sync Scan what VRoid currently exposes: built-in presets AND custom items (with the"><td><code>vroid_preset_cache_sync</code></td><td>Scan what VRoid currently exposes: built-in presets AND custom items (with the name given in VRoid). Reports new, changed (renamed custom item or new…</td></tr>
+          <tr data-tool="vroid_preset_cache_build Create situation thumbnails for a category (presets, or Custom/&lt;slot&gt; for custom items)."><td><code>vroid_preset_cache_build</code></td><td>Create situation thumbnails for a category (presets, or Custom/&lt;slot&gt; for custom items). Removes ALL clothes, accessories, underwear (including defau…</td></tr>
+        </tbody></table>
+      </details>
+      <details class="tool-group">
+        <summary><span>Body &amp; camera</span><span class="tool-badge">4</span></summary>
+        <table><thead><tr><th scope="col">Tool</th><th scope="col">Purpose</th></tr></thead><tbody>
+          <tr data-tool="vroid_measure Measure the current model height in cm (same as VRoid&#x27;s size label)"><td><code>vroid_measure</code></td><td>Measure the current model height in cm (same as VRoid's size label) and its bounds.</td></tr>
+          <tr data-tool="vroid_set_body_size Set the height (cm) directly through the gender silhouette slider (FigureHeight/FigureSlender, proportions"><td><code>vroid_set_body_size</code></td><td>Set the height (cm) directly through the gender silhouette slider (FigureHeight/FigureSlender, proportions preserved), and optionally weight (kg), co…</td></tr>
+          <tr data-tool="vroid_camera Aim the VRoid 3D view at the model from another angle before"><td><code>vroid_camera</code></td><td>Aim the VRoid 3D view at the model from another angle before a capture. action: get (state + preset rotations), angles (x,y in degrees), rotate (dx,d…</td></tr>
+          <tr data-tool="vroid_face_preview Expression preview for a capture (open mouth to show teeth, smile, wink...):"><td><code>vroid_face_preview</code></td><td>Expression preview for a capture (open mouth to show teeth, smile, wink...): set the weight (0..100) of face blendshapes whose name ends with name (e…</td></tr>
+        </tbody></table>
+      </details>
+    </div>
+  </div>
+</section>
+    <section class="section" id="installation">
+      <div class="container">
+        <header class="section-head" data-reveal>
+          <p class="eyebrow"><span class="eyebrow-num">05</span>Install</p>
+          <h2>Three steps, one installer.</h2>
+          <p class="lede">Windows, VRoid Studio and Python 3.8+ (PATH). The installer takes care of BepInEx 6, the plugin, the MCP server and the Claude configuration.</p>
+        </header>
+
+        <div class="install-grid">
+          <ol class="install-steps" data-reveal>
+            <li>
+              <span class="step">1</span>
+              <div><h3>Download the release</h3><p>Get <code>VRoidMcp-v0.11.0.zip</code> from GitHub Releases and unzip it.</p></div>
+            </li>
+            <li>
+              <span class="step">2</span>
+              <div><h3>Close VRoid, run the installer</h3><p>Double-click <code>Installer.cmd</code>. It finds VRoid through Steam, installs BepInEx if needed and copies the plugin.</p></div>
+            </li>
+            <li>
+              <span class="step">3</span>
+              <div><h3>Restart Claude</h3><p>Restart Claude Code or Claude Desktop: the <code>vroid_*</code> tools appear in the session.</p></div>
+            </li>
+          </ol>
+
+          <aside class="req-card" data-reveal>
+            <h3>Requirements</h3>
+            <ul class="check-list">
+              <li>Windows 10 / 11</li>
+              <li>VRoid Studio (Steam, Unity 6000.0.62)</li>
+              <li>Python 3.8 or newer</li>
+              <li>numpy and Pillow recommended for textures</li>
+            </ul>
+            <p class="req-note">The first launch after BepInEx takes one to two extra minutes (interop generation).</p>
+            <a class="btn btn-primary btn-block" href="https://github.com/mcjo79/vroid-mcp/releases/latest" target="_blank" rel="noopener">Open releases</a>
+          </aside>
+        </div>
+
+        <div class="install-details" data-reveal>
+          <details class="info-block">
+            <summary>What the installer does exactly</summary>
+            <ul class="check-list">
+              <li>Finds VRoid in your Steam libraries (otherwise <code>Installer.cmd -GameDir "&lt;folder&gt;"</code>).</li>
+              <li>Installs BepInEx 6.0.0-be.791 IL2CPP, verifies the SHA-256, and sets aside a previous version.</li>
+              <li>Copies the plugin to <code>BepInEx\plugins\VRoidMcpBridge</code>.</li>
+              <li>Copies the server, tools and documentation to <code>%LOCALAPPDATA%\VRoidMcp</code>.</li>
+              <li>Registers the <code>vroid</code> server in Claude Code and Claude Desktop, after backing up the configuration.</li>
+            </ul>
+          </details>
+          <details class="info-block">
+            <summary>Why a BepInEx plugin?</summary>
+            <p>VRoid Studio is a Unity IL2CPP game. The plugin runs inside VRoid's process and accesses <code>VRoidCore.Editing.Context</code> directly: that's what makes it possible to read parameters and run real edit commands, instead of simulating clicks.</p>
+          </details>
+          <details class="info-block">
+            <summary>Security and privacy</summary>
+            <p>The HTTP server only listens on <code>127.0.0.1:7811</code>. No data is sent over the network. The MCP server runs over stdio with no Python dependencies. All changes can be undone in VRoid.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="coulisses">
+      <div class="container">
+        <header class="section-head" data-reveal>
+          <p class="eyebrow"><span class="eyebrow-num">06</span>Under the hood</p>
+          <h2>The details that make the difference.</h2>
+          <p class="lede">An IL2CPP bridge requires a few precautions. Here are the pitfalls we hit and what we verified.</p>
+        </header>
+
+        <div class="cards-3">
+          <article class="mini-card" data-reveal>
+            <span class="mini-num">01</span>
+            <h3>Focus</h3>
+            <p>VRoid pauses its loop when its window loses focus. The plugin forces <code>Application.runInBackground</code> so commands stay responsive.</p>
+          </article>
+          <article class="mini-card" data-reveal>
+            <span class="mini-num">02</span>
+            <h3>KeyValuePair</h3>
+            <p>Building IL2CPP <code>KeyValuePair&lt;,&gt;</code> on the managed side crashes the runtime. The bridge uses a native <code>Dictionary</code>.</p>
+          </article>
+          <article class="mini-card" data-reveal>
+            <span class="mini-num">03</span>
+            <h3>Captures</h3>
+            <p><code>ScreenCapture.CaptureScreenshot(string)</code> crashes in the interop. The plugin uses <code>CaptureScreenshotAsTexture</code> then <code>EncodeToPNG</code>.</p>
+          </article>
+        </div>
+
+        <div class="version-table" data-reveal>
+          <h3>Validated environment</h3>
+          <table>
+            <tbody>
+              <tr><th scope="row">VRoid Studio</th><td>2.14.0</td><th scope="row">Unity</th><td>6000.0.62f1</td></tr>
+              <tr><th scope="row">BepInEx</th><td>6.0.0-be.791 (IL2CPP)</td><th scope="row">Plugin</th><td>0.11.0</td></tr>
+              <tr><th scope="row">MCP server</th><td>Python 3.8+ (PATH), stdlib</td><th scope="row">System</th><td>Windows 10 / 11</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="limitations" data-reveal>
+          <h3>Known limits</h3>
+          <p>A VRoid Studio update may rename internal classes and break the plugin. BepInEx 6 is "bleeding edge": stable here, with no guarantee. BepInEx 5 plugins (such as VRoidXYTool) are not compatible with this IL2CPP setup.</p>
+          <p>The bridge exposes what VRoid exposes: some very specific settings (baked shadows, shaders) remain out of reach. That is also what keeps edits clean and undoable.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="container faq-wrap">
+        <header class="section-head" data-reveal>
+          <p class="eyebrow"><span class="eyebrow-num">07</span>FAQ</p>
+          <h2>Frequently asked questions.</h2>
+        </header>
+
+        <div class="faq" data-reveal>
+          <details>
+            <summary>Do I need Claude to use it?</summary>
+            <p>No. The server speaks MCP over stdio: Claude Code and Claude Desktop are configured by the installer, but any compatible MCP client — including DeepSeek — can launch <code>vroid_mcp.py</code> and call the tools.</p>
+          </details>
+          <details>
+            <summary>Does it work with the latest VRoid?</summary>
+            <p>The bridge is validated with VRoid Studio 2.14.0 (Unity 6000.0.62). An update may rename internal classes; in that case the dump has to be redone and the plugin adjusted.</p>
+          </details>
+          <details>
+            <summary>Are changes permanent?</summary>
+            <p>No. They go through VRoid's history: <kbd>Ctrl</kbd>+<kbd>Z</kbd> undoes them, and <code>vroid_undo</code> / <code>vroid_redo</code> are exposed to the AI. The open project is not saved automatically.</p>
+          </details>
+          <details>
+            <summary>Does the bridge send data to the internet?</summary>
+            <p>No. The plugin listens on loopback (<code>127.0.0.1:7811</code>) and the MCP server communicates over stdio with the client. No telemetry is included.</p>
+          </details>
+          <details>
+            <summary>Can I use it for more than characters?</summary>
+            <p>Yes: the tools also cover clothes, presets, textures, expressions and camera. The preset cache helps you choose without reopening VRoid for every try.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-band">
+      <div class="container cta-band-inner" data-reveal>
+        <div>
+          <h2>Ready to connect your AI to VRoid?</h2>
+          <p>Download the release, run the installer, restart Claude (or any MCP client).</p>
+        </div>
+        <div class="cta-band-actions">
+          <a class="btn btn-primary" href="https://github.com/mcjo79/vroid-mcp/releases/latest" target="_blank" rel="noopener">Download v0.11.0</a>
+          <a class="btn btn-secondary" href="https://github.com/mcjo79/vroid-mcp" target="_blank" rel="noopener">View the code</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="#top" aria-label="Back to top">
+          <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+            <rect width="64" height="64" rx="16" fill="currentColor"/>
+            <path d="M16 18 L32 46 L48 18" fill="none" stroke="#F0C23A" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="49" cy="16" r="6" fill="#B02A37"/>
+          </svg>
+          <span class="brand-text">VRoid <b>MCP</b><small>Bridge</small></span>
+        </a>
+        <p>A local bridge between an AI and VRoid Studio.<br>Bridge: Claude Code · Character test &amp; site: DeepSeek.</p>
+      </div>
+      <nav class="footer-col" aria-label="Project links">
+        <h3>Project</h3>
+        <a href="https://github.com/mcjo79/vroid-mcp" target="_blank" rel="noopener">GitHub repository</a>
+        <a href="https://github.com/mcjo79/vroid-mcp/releases/latest" target="_blank" rel="noopener">Releases</a>
+        <a href="https://github.com/mcjo79/vroid-mcp/issues" target="_blank" rel="noopener">Issues</a>
+        <a href="https://github.com/mcjo79/vroid-mcp/blob/main/README.md" target="_blank" rel="noopener">README</a>
+        <a href="https://mcjo79.github.io/">All projects</a>
+        <a href="privacy/">Privacy policy</a>
+        <button type="button" class="footer-link-button" data-consent-open>Cookie settings</button>
+      </nav>
+      <nav class="footer-col" aria-label="Documentation">
+        <h3>Documentation</h3>
+        <a href="https://github.com/mcjo79/vroid-mcp/blob/main/docs/REFERENCE.md" target="_blank" rel="noopener">MCP reference</a>
+        <a href="https://github.com/mcjo79/vroid-mcp/blob/main/docs/TEXTURES.md" target="_blank" rel="noopener">Texture editing</a>
+        <a href="#installation">Install</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="footer-col">
+        <h3>Status</h3>
+        <p class="footer-status"><span class="status-dot"></span>v0.11.0 · public</p>
+        <p>Site last updated: October 2026.</p>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>© <span id="year">2026</span> mcjo79. Not affiliated with pixiv Inc. VRoid Studio is a trademark of pixiv Inc.</p>
+      <p><a href="https://github.com/mcjo79/vroid-mcp" target="_blank" rel="noopener">github.com/mcjo79/vroid-mcp</a></p>
+    </div>
+  </footer>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image preview" hidden>
+    <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close preview">×</button>
+    <figure>
+      <img id="lightboxImg" src="" alt="">
+      <figcaption id="lightboxCaption"></figcaption>
+    </figure>
+  </div>
+
+  <script>
+    window.SITE_I18N = {
+      themeToDark: "Switch to dark theme",
+      themeToLight: "Switch to light theme",
+      menuOpen: "Open menu",
+      menuClose: "Close menu",
+      copied: "Copied!",
+      noTools: "No tools found",
+      tool: "tool",
+      tools: "tools"
+    };
+  </script>
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>

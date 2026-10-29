@@ -1,0 +1,183 @@
+{
+  "version": 1,
+  "updated": "2026-10-28",
+  "comment": "Cadrage des vignettes par catégorie/partie du corps. top/bottom = fractions depuis le haut du modèle (0 = sommet, 1 = pieds), half = demi-largeur en fraction de hauteur (null = toute la largeur), distance = facteur de recul, yaw = orientation en degrés (0 = face, 90 = profil, 180 = dos), fit = region|full-body. Les defaults sont la référence ; les overrides IA vont dans preset_cache/framing_overrides.json et sont effacés par vroid_framing_reset.",
+  "defaults": {
+    "Clothing/Tops": {
+      "top": 0.12,
+      "bottom": 0.62,
+      "half": null,
+      "distance": 3.3,
+      "fit": "region",
+      "yaw": 0
+    },
+    "Clothing/Onepiece": {
+      "top": 0.12,
+      "bottom": 0.85,
+      "half": null,
+      "distance": 3.3,
+      "fit": "region",
+      "yaw": 0
+    },
+    "VRoid/ClothingSet": {
+      "top": 0.0,
+      "bottom": 1.0,
+      "half": null,
+      "distance": 4.2,
+      "fit": "full-body",
+      "yaw": 0
+    },
+    "Clothing/InnerTop": {
+      "top": 0.12,
+      "bottom": 0.45,
+      "half": 0.2,
+      "distance": 3.3,
+      "fit": "region",
+      "yaw": 0
+    },
+    "Clothing/Bottoms": {
+      "top": 0.4,
+      "bottom": 0.8,
+      "half": 0.22,
+      "distance": 3.3,
+      "fit": "region",
+      "yaw": 0
+    },
+    "Clothing/InnerBottom": {
+      "top": 0.4,
+      "bottom": 0.65,
+      "half": 0.22,
+      "distance": 3.3,
+      "fit": "region",
+      "yaw": 0
+    },
+    "Clothing/Socks": {
+      "top": 0.5,
+      "bottom": 1.0,
+      "half": 0.22,
+      "distance": 3.3,
+      "fit": "region",
+      "yaw": 0
+    },
+    "Clothing/Shoes": {
+      "top": 0.8,
+      "bottom": 1.0,
+      "half": 0.22,
+      "distance": 3.3,
+      "fit": "region",
+      "yaw": 45
+    },
+    "Clothing/AccessoryNeck": {
+      "top": 0.1,
+      "bottom": 0.35,
+      "half": 0.18,
+      "distance": 3.3,
+      "fit": "region",
+      "yaw": 0
+    },
+    "Clothing/AccessoryArm": {
+      "top": 0.15,
+      "bottom": 0.5,
+      "half": null,
+      "distance": 3.3,
+      "fit": "region",
+      "yaw": 45
+    },
+    "Attachment": {
+      "top": 0.0,
+      "bottom": 0.4,
+      "half": 0.25,
+      "distance": 3.3,
+      "fit": "region",
+      "yaw": 0
+    },
+    "Hair": {
+      "top": 0.0,
+      "bottom": 0.32,
+      "half": 0.2,
+      "distance": 3.3,
+      "fit": "region",
+      "yaw": 0
+    },
+    "Hair/AllHair": {
+      "top": 0.0,
+      "bottom": 0.8,
+      "half": 0.3,
+      "distance": 3.5,
+      "fit": "region",
+      "yaw": 135
+    },
+    "Hair/Back": {
+      "top": 0.0,
+      "bottom": 0.6,
+      "half": 0.3,
+      "distance": 3.5,
+      "fit": "region",
+      "yaw": 180
+    },
+    "Hair/Tied": {
+      "top": 0.0,
+      "bottom": 0.6,
+      "half": 0.3,
+      "distance": 3.5,
+      "fit": "region",
+      "yaw": 180
+    },
+    "VRoid/HairSet": {
+      "top": 0.0,
+      "bottom": 0.7,
+      "half": 0.3,
+      "distance": 3.5,
+      "fit": "region",
+      "yaw": 135
+    },
+    "VRoid/Body": {
+      "top": 0.0,
+      "bottom": 1.0,
+      "half": null,
+      "distance": 3.8,
+      "fit": "full-body",
+      "yaw": 0
+    },
+    "Face": {
+      "top": 0.02,
+      "bottom": 0.2,
+      "half": 0.12,
+      "distance": 3.3,
+      "fit": "region",
+      "yaw": 0
+    },
+    "Overlay": {
+      "top": 0.02,
+      "bottom": 0.2,
+      "half": 0.12,
+      "distance": 3.3,
+      "fit": "region",
+      "yaw": 0
+    },
+    "VRoid/FaceSet": {
+      "top": 0.02,
+      "bottom": 0.2,
+      "half": 0.12,
+      "distance": 3.3,
+      "fit": "region",
+      "yaw": 0
+    },
+    "VRoid/EyeSet": {
+      "top": 0.06,
+      "bottom": 0.16,
+      "half": 0.1,
+      "distance": 3.3,
+      "fit": "region",
+      "yaw": 0
+    },
+    "VRoid/EyeballSet": {
+      "top": 0.06,
+      "bottom": 0.16,
+      "half": 0.1,
+      "distance": 3.3,
+      "fit": "region",
+      "yaw": 0
+    }
+  }
+}

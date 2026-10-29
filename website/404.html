@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" data-privacy="privacy/">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page not found — VRoid MCP Bridge</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/gtag-init.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2NDE82V29F"></script>
+  <script src="assets/js/consent.js" defer></script>
+  <script>
+    (function () {
+      var root = document.documentElement;
+      try {
+        var saved = localStorage.getItem('vroid-theme');
+        if (saved === 'dark' || saved === 'light') root.dataset.theme = saved;
+        else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) root.dataset.theme = 'dark';
+      } catch (e) {}
+      root.classList.remove('no-js');
+    })();
+  </script>
+</head>
+<body>
+  <main class="section" style="min-height:100vh;display:grid;place-items:center;">
+    <div class="container" style="max-width:640px;text-align:center;">
+      <p class="eyebrow" style="justify-content:center;"><span class="eyebrow-dot"></span>Error 404</p>
+      <p style="font-size:clamp(5rem,18vw,9rem);font-weight:800;line-height:.9;letter-spacing:-.06em;margin:0;color:var(--ink);">404</p>
+      <h1 style="font-size:clamp(1.6rem,4vw,2.4rem);margin:22px 0 12px;">This page doesn't exist.</h1>
+      <p class="lede" style="margin-inline:auto;">The bridge is still here. Head back home to explore VRoid MCP Bridge.</p>
+      <div class="hero-cta" style="justify-content:center;">
+        <a class="btn btn-primary" href="./">Back home</a>
+        <a class="btn btn-secondary" href="https://github.com/mcjo79/vroid-mcp" target="_blank" rel="noopener">View on GitHub</a>
+      </div>
+      <p style="margin-top:22px;font-size:.82rem;color:var(--faint);"><a href="fr/" hreflang="fr" lang="fr" style="color:var(--gold);">Version française</a> · <a href="privacy/" style="color:var(--gold);">Privacy</a> · <button type="button" style="background:none;border:0;padding:0;color:var(--gold);font:inherit;cursor:pointer;" data-consent-open>Cookies</button></p>
+    </div>
+  </main>
+</body>
+</html>

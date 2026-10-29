@@ -18,7 +18,7 @@ public static class Presets
     {
         var ed = UnityEngine.Object.FindObjectOfType<AvatarEditor>();
         var user = ed?._viewModel?._mainModel?.playFabUser;
-        return user ?? throw new InvalidOperationException("catalogue des presets introuvable (VRoid pas encore prêt ?)");
+        return user ?? throw new InvalidOperationException("preset catalog not found (VRoid not ready yet?)");
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public static class Presets
     /// </summary>
     public static async Task<object> Remove(string group)
     {
-        if (string.IsNullOrEmpty(group)) throw new ArgumentException("paramètre manquant : group");
+        if (string.IsNullOrEmpty(group)) throw new ArgumentException("missing parameter: group");
         var ids = await MainThread.Run(() =>
         {
             var c = VRoidApi.RequireContextPublic();
@@ -82,7 +82,7 @@ public static class Presets
             }
             return list;
         });
-        if (ids.Count == 0) throw new ArgumentException($"aucun groupe actif ne correspond à {group}");
+        if (ids.Count == 0) throw new ArgumentException($"no active group matches {group}");
         foreach (var id in ids)
             await MainThread.RunAsync<object>(tcs => VRoidApi.RequireContextPublic().RemoveTransferableGroupAndChildren(id,
                 (Il2CppSystem.Action)(Action)(() => tcs.TrySetResult(null)),
@@ -90,15 +90,31 @@ public static class Presets
         return new { ok = true, removed = ids };
     }
 
+    /// <summary>
+    /// Recharge un groupe par son id, sans passer par le catalogue des presets : sert à remettre un élément retiré
+    /// (preset ou objet personnalisé enregistré). Annulable.
+    /// </summary>
+    public static Task<object> LoadGroup(string id) => MainThread.RunAsync<object>(tcs =>
+    {
+        if (string.IsNullOrEmpty(id)) throw new ArgumentException("missing parameter: id");
+        // Un objet personnalisé n'est pas dans les données de VRoid : le recharger par son id fige le contexte.
+        if (id.StartsWith("user_", StringComparison.Ordinal) || id.StartsWith("user/", StringComparison.Ordinal))
+            throw new ArgumentException("custom item: use /apply_custom with its file");
+        VRoidApi.RequireContextPublic().LoadAndReplaceTransferableGroup(id,
+            (Il2CppSystem.Action)(Action)(() => tcs.TrySetResult(new { ok = true, id })),
+            (Il2CppSystem.Action<Il2CppSystem.Exception>)(Action<Il2CppSystem.Exception>)(e => tcs.TrySetException(new Exception(e.Message))),
+            false);
+    });
+
     /// <summary>Applique un preset (remplace l'élément de la même catégorie). Annulable avec Ctrl+Z.</summary>
     public static Task<object> Apply(string id, bool preserveMaterial) => MainThread.RunAsync<object>(tcs =>
     {
-        if (string.IsNullOrEmpty(id)) throw new ArgumentException("paramètre manquant : id");
+        if (string.IsNullOrEmpty(id)) throw new ArgumentException("missing parameter: id");
         var cat = Catalog().GetTransferableGroupIdToPresetModel();
-        if (!cat.ContainsKey(id)) throw new ArgumentException($"preset inconnu : {id}");
+        if (!cat.ContainsKey(id)) throw new ArgumentException($"unknown preset: {id}");
         var p = cat[id];
         if (!(p.isOwned || p.priceInCoin == 0))
-            throw new InvalidOperationException("preset payant non possédé : à acheter dans VRoid d'abord");
+            throw new InvalidOperationException("paid preset not owned: buy it in VRoid first");
         var c = VRoidApi.RequireContextPublic();
         c.LoadAndReplaceTransferableGroup(id,
             (Il2CppSystem.Action)(Action)(() => tcs.TrySetResult(new { ok = true, id, resource = p.resourceName })),

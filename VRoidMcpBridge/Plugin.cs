@@ -12,7 +12,7 @@ using VRoid.Studio.Component;
 
 namespace VRoidMcpBridge;
 
-[BepInPlugin(Guid, "VRoid MCP Bridge", "0.10.0")]
+[BepInPlugin(Guid, "VRoid MCP Bridge", "0.12.0")]
 public class Plugin : BasePlugin
 {
     public const string Guid = "dev.vroid.mcpbridge";
@@ -30,7 +30,10 @@ public class Plugin : BasePlugin
         comp.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
         // Seconde source de "ticks" : tourne à chaque frame quand un modèle est ouvert.
-        new Harmony(Guid).PatchAll(typeof(Plugin).Assembly);
+        var harmony = new Harmony(Guid);
+        harmony.PatchAll(typeof(Plugin).Assembly);
+        LifecycleHooks.Patch(harmony);
+        VrmExportProbe.Patch(harmony);
 
         _http = new HttpBridge(Port);
         _http.Start();
@@ -56,7 +59,7 @@ public class MainThread : MonoBehaviour
     static readonly ConcurrentQueue<Action> Queue = new();
     static int _mainThreadId = -1;
     public static DateTime LastPumpUtc { get; private set; }
-    public static string LastPumpSource { get; private set; } = "aucun";
+    public static string LastPumpSource { get; private set; } = "none";
     public static int Pending => Queue.Count;
     static readonly TimeSpan Timeout = TimeSpan.FromSeconds(10);
 
@@ -86,17 +89,19 @@ public class MainThread : MonoBehaviour
         if (tid != _mainThreadId) return;
         CaptureUnityContext();
         // VRoid suspend sa boucle quand la fenêtre n'a pas le focus : l'IA travaille justement
-        // pendant que l'utilisateur est dans une autre fenêtre. On garde VRoid actif en arrière-plan.
+        // pendant que l'utilisateur est dans une autre fenêtre. Le mode minimisé/arrière-plan
+        // est le seul mode supporté (testé) ; pas de bascule foreground.
         if (!Application.runInBackground) Application.runInBackground = true;
         LastPumpUtc = DateTime.UtcNow;
         LastPumpSource = source;
         for (int i = 0; i < 32 && Queue.TryDequeue(out var a); i++) a();
     }
 
-    public static Task<T> Run<T>(Func<T> fn) => RunAsync<T>(tcs => tcs.SetResult(fn()));
+    public static Task<T> Run<T>(Func<T> fn, TimeSpan? timeout = null) =>
+        RunAsync<T>(tcs => tcs.SetResult(fn()), timeout);
 
     /// <summary>Pour les API asynchrones de VRoid (callbacks onSuccess/onError).</summary>
-    public static async Task<T> RunAsync<T>(Action<TaskCompletionSource<T>> start)
+    public static async Task<T> RunAsync<T>(Action<TaskCompletionSource<T>> start, TimeSpan? timeout = null)
     {
         var tcs = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
         Queue.Enqueue(() =>
@@ -111,9 +116,10 @@ public class MainThread : MonoBehaviour
             Action<Il2CppSystem.Object> cb = _ => Pump("UnitySynchronizationContext");
             _unityContext.Post(cb, null);
         }
-        var done = await Task.WhenAny(tcs.Task, Task.Delay(Timeout));
+        var limit = timeout ?? Timeout;
+        var done = await Task.WhenAny(tcs.Task, Task.Delay(limit));
         if (done != tcs.Task)
-            throw new TimeoutException($"Le thread principal de VRoid n'a pas répondu en {Timeout.TotalSeconds:0} s " +
+            throw new TimeoutException($"The VRoid main thread did not respond within {limit.TotalSeconds:0} s " +
                                        $"(dernier tick : {LastPumpSource}, {LastPumpUtc:HH:mm:ss} UTC).");
         return await tcs.Task;
     }

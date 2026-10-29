@@ -23,7 +23,7 @@ public static class Textures
     /// <summary>Éléments (transferables) d'un groupe → images éditables → calques.</summary>
     public static object Layers(string groupId)
     {
-        if (string.IsNullOrEmpty(groupId)) throw new ArgumentException("paramètre manquant : group");
+        if (string.IsNullOrEmpty(groupId)) throw new ArgumentException("missing parameter: group");
         var c = Ctx();
         var model = c.ActiveModel;
         var result = new List<object>();
@@ -127,17 +127,17 @@ public static class Textures
 
     /// <summary>
     /// Importe un PNG dans un calque existant (remplacement) ou comme nouveau calque.
-    /// Le PNG doit avoir la taille de l'image (celle donnée par l'export). Annulable (Ctrl+Z).
+    /// Le PNG doit avoir la size de l'image (celle donnée par l'export). Annulable (Ctrl+Z).
     /// </summary>
     public static object Import(string transferable, string image, string node, string path, bool asNewLayer)
     {
         var c = Ctx();
-        if (!File.Exists(path)) throw new FileNotFoundException($"PNG introuvable : {path}");
+        if (!File.Exists(path)) throw new FileNotFoundException($"PNG not found: {path}");
         var bytes = File.ReadAllBytes(path);
         var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
         try
         {
-            if (!ImageConversion.LoadImage(tex, bytes)) throw new InvalidDataException("PNG illisible");
+            if (!ImageConversion.LoadImage(tex, bytes)) throw new InvalidDataException("unreadable PNG");
             int w = tex.width, h = tex.height;
             UColor[] px = tex.GetPixels();
             var pixels = new Il2CppStructArray<UColor>(px);
@@ -151,10 +151,10 @@ public static class Textures
             }
             else
             {
-                if (string.IsNullOrEmpty(node)) throw new ArgumentException("paramètre manquant : node (ou as_new_layer=true)");
+                if (string.IsNullOrEmpty(node)) throw new ArgumentException("missing parameter: node (or as_new_layer=true)");
                 var expected = new GetRasterLayerContentQuery(LayerPath(transferable, image, node)).Execute(c.ActiveModel).size;
                 if (expected.x != w || expected.y != h)
-                    throw new ArgumentException($"taille {w}x{h} différente du calque ({expected.x}x{expected.y})");
+                    throw new ArgumentException($"size {w}x{h} differs from layer ({expected.x}x{expected.y})");
                 var cmd = new LoadImageToEditableImageRasterLayerCommand(LayerPath(transferable, image, node), size, pixels);
                 c.ExecuteSyncCommand(cmd.Cast<ISyncCommand<Context.HistoryManagerContext, Model>>());
             }

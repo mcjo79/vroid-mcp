@@ -220,14 +220,17 @@ Info "Installé dans $pluginDir"
 
 Step "Serveur MCP"
 New-Item -ItemType Directory -Force -Path $McpDir | Out-Null
-foreach ($d in @("mcp_server", "tools", "docs")) {
+foreach ($d in @("mcp_server", "tools", "docs", "config")) {
     $src = Join-Path $Here $d
     if (Test-Path $src) {
         New-Item -ItemType Directory -Force -Path (Join-Path $McpDir $d) | Out-Null
         Copy-Item -Recurse -Force (Join-Path $src "*") (Join-Path $McpDir $d)
     }
 }
-Copy-Item -Force (Join-Path $Here "README.md") $McpDir
+foreach ($f in @("README.md", "README-fr.md", "LICENSE", "THIRD_PARTY_NOTICES.md")) {
+    $p = Join-Path $Here $f
+    if (Test-Path $p) { Copy-Item -Force $p $McpDir }
+}
 # Cache des presets : données locales, jamais fournies par la release. Un cache existant est conservé ;
 # sinon il se remplit à l'usage (vroid_preset_cache_sync / vroid_preset_cache_build).
 $cacheDst = Join-Path $McpDir "preset_cache"

@@ -17,10 +17,13 @@ import os
 import tempfile
 import time
 
+import labeler
+
 SCHEMA_VERSION = 1
 SCHEMA = {
     "schema": SCHEMA_VERSION,
-    "source": {"app": "VRoid Studio", "unity": "version Unity", "presetFingerprint": "sha1 des chemins de ressource"},
+    "source": {"app": "VRoid Studio", "unity": "version Unity", "presetFingerprint": "sha1 des clés présentes",
+               "session": "date de lancement du plugin au dernier scan", "lastScan": "date du dernier scan"},
     "updated": "date ISO de la dernière écriture",
     "presets": {
         "<resource>": {
@@ -31,7 +34,41 @@ SCHEMA = {
             "number": "numéro dans la catégorie (texte, ex. '013' ou 'Initial_001')",
             "usable": "gratuit ou possédé",
             "price": "prix en pièces",
-            "thumbnail": "chemin relatif de la vignette ou null",
+            "kind": "preset (intégré) ou custom (objet personnalisé de l'utilisateur, clé 'custom:<ressource>')",
+            "name": "custom : nom donné dans VRoid, relu à chaque scan",
+            "status": "new | changed (custom renommé ou nouvelle révision) | absent si déjà vu",
+            "removed": "true si absent de VRoid au dernier scan (annotations conservées)",
+            "firstSeen / lastSeen": "dates de scan",
+            "thumbnail": "chemin relatif de la vignette en situation (capture recadrée) ou null",
+            "thumbnailKind / thumbnailAt": "type de vignette (situation) et date de génération",
+            "thumbnailMeta": {
+                "kind": "situation",
+                "mannequin": "neutral (sans vêtements, sous-vêtements ni cheveux, sauf pièce testée)",
+                "clothing": "tested-item-only",
+                "underwear": "removed",
+                "hair": "removed-except-base",
+                "keptSlot": "emplacement conservé pendant la capture",
+                "strippedSlots / underwearRemoved / hairRemoved": "listes de ce qui a été retiré",
+                "camera": "cadrage utilisé (dont yaw)", "orientation": "front|profile|back|three-quarter",
+                "pixels": "[largeur, hauteur]",
+                "bytes / sha1": "taille et empreinte du fichier",
+                "capturedAt / source": "date et origine de la capture"
+            },
+            "icon": "chemin relatif de l'icône native de VRoid (presets intégrés) ou null",
+            "iconKind / iconAt": "icône native et date de récupération",
+            "label": "libellé lisible (généré au scan/build, ou manuel)",
+            "labelSource": "generated | manual",
+            "labelGeneratedAt / labelVersion": "date et version du générateur de label",
+            "generated": {
+                "version": 1,
+                "method": "structural | structural+thumbnail",
+                "at": "date ISO",
+                "colors": ["couleurs dominantes déduites de la vignette"],
+                "tags": ["type + couleurs + plain|patterned"],
+                "confidence": "0..1, faible par construction",
+                "visual": {"colors": [], "brightness": "0..1", "pattern": "plain|patterned",
+                           "edgeDensity": "0..1", "background": []}
+            },
             "description": "texte libre court, en français ou en anglais",
             "tags": ["mots-clés en minuscules : type, couleur, longueur, style..."],
             "colors": ["couleurs dominantes en mots simples"],
@@ -60,11 +97,197 @@ REGIONS = {
 }
 
 
-def region_for(category):
-    if category in REGIONS:
-        return REGIONS[category]
+# Objets personnalisés : même zone que la catégorie de presets équivalente.
+CUSTOM_EQUIV = {
+    "Tops": "Clothing/Tops", "Bottoms": "Clothing/Bottoms", "Onepiece": "Clothing/Onepiece",
+    "Socks": "Clothing/Socks", "Shoes": "Clothing/Shoes", "InnerTop": "Clothing/InnerTop",
+    "InnerBottom": "Clothing/InnerBottom", "ArmAccessory": "Clothing/AccessoryArm",
+    "NeckAccessory": "Clothing/AccessoryNeck", "AllHair": "Hair/AllHair", "HairFront": "Hair",
+    "HairBack": "Hair/Back", "BaseHair": "Hair", "BodySkin": "VRoid/Body",
+}
+
+
+FRAMING_PATH = os.environ.get("VROID_FRAMING_CONFIG") or os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config", "framing.json")
+FRAMING_OVERRIDES = os.environ.get("VROID_FRAMING_OVERRIDES") or os.path.join(ROOT, "framing_overrides.json")
+
+
+def _default_framing_entry(key):
+    base = REGIONS.get(key)
+    if base is None:
+        base = REGIONS.get(key.split("/")[0], (0.0, 1.0, None))
+    top, bottom, half = base
+    return {"top": top, "bottom": bottom, "half": half, "yaw": 0.0,
+            "distance": 4.2 if key == "VRoid/ClothingSet" else 3.3,
+            "fit": "full-body" if key in ("VRoid/ClothingSet", "VRoid/Body") else "region"}
+
+
+def _framing_entry(entry, key):
+    """Normalise une entrée JSON (dict, ou ancien triplet [top, bottom, half])."""
+    if isinstance(entry, (list, tuple)) and len(entry) >= 3:
+        return {"top": float(entry[0]), "bottom": float(entry[1]), "half": entry[2], "yaw": 0.0,
+                "distance": 4.2 if key == "VRoid/ClothingSet" else 3.3,
+                "fit": "full-body" if key in ("VRoid/ClothingSet", "VRoid/Body") else "region"}
+    e = dict(entry or {})
+    return {
+        "top": float(e.get("top", 0.0)),
+        "bottom": float(e.get("bottom", 1.0)),
+        "half": e.get("half"),
+        "distance": float(e.get("distance", 3.3)),
+        "yaw": float(e.get("yaw", 0.0)),
+        "fit": e.get("fit") or "region",
+    }
+
+
+def load_framing():
+    """Charge les defaults commités (config/framing.json) et les overrides locaux.
+    En cas d'absence des defaults, les valeurs de secours restent dans REGIONS."""
+    try:
+        with open(FRAMING_PATH, encoding="utf-8") as f:
+            cfg = json.load(f)
+    except (OSError, ValueError):
+        cfg = {}
+    defaults = cfg.get("defaults") if isinstance(cfg.get("defaults"), dict) else {}
+    # Les overrides sont locaux (preset_cache/framing_overrides.json) : une mise à jour
+    # du paquet peut remplacer config/framing.json sans perdre les réglages de l'IA.
+    overrides = {}
+    try:
+        with open(FRAMING_OVERRIDES, encoding="utf-8") as f:
+            ov = json.load(f)
+        if isinstance(ov.get("overrides"), dict):
+            overrides.update(ov["overrides"])
+    except (OSError, ValueError):
+        pass
+    return {"version": cfg.get("version", 1), "defaults": defaults, "overrides": overrides}
+
+
+def _save_framing(cfg):
+    """Écrit uniquement les overrides locaux, jamais les defaults commités."""
+    os.makedirs(os.path.dirname(FRAMING_OVERRIDES), exist_ok=True)
+    data = {"version": cfg.get("version", 1), "updated": now(),
+            "comment": "Overrides de cadrage locaux ; defaults dans config/framing.json.",
+            "overrides": cfg.get("overrides", {})}
+    tmp = FRAMING_OVERRIDES + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2, sort_keys=True)
+        f.write("\n")
+    os.replace(tmp, FRAMING_OVERRIDES)
+
+
+def _framing_key(category, strict=False):
+    """Clé de cadrage = catégorie / partie du corps, jamais un preset individuel.
+    Custom/<slot> est ramené à la catégorie de preset équivalente."""
+    cfg = load_framing()
+    known = set(REGIONS) | set(cfg["defaults"])
+    if category in known:
+        return category
+    if category.startswith("Custom/"):
+        slot = category.split("/", 1)[1]
+        if slot in CUSTOM_EQUIV:
+            return CUSTOM_EQUIV[slot]
     part = category.split("/")[0]
-    return REGIONS.get(part, (0.0, 1.0, None))
+    if part in known:
+        return part
+    if strict:
+        raise ValueError(
+            f"clé de cadrage invalide : {category!r}. Utiliser une catégorie/partie du corps "
+            "(ex. Clothing/Tops, Clothing/Shoes, Hair, Face, VRoid/ClothingSet), pas un preset individuel ; "
+            "les informations par vêtement restent dans le cache.")
+    return category
+
+
+def framing_for(category):
+    """Cadrage effectif d'une catégorie : override IA > default du projet > fallback code."""
+    cfg = load_framing()
+    key = _framing_key(category)
+    source = "override"
+    entry = cfg["overrides"].get(key)
+    if entry is None:
+        source = "default"
+        entry = cfg["defaults"].get(key)
+    if entry is None:
+        source = "fallback"
+        entry = _default_framing_entry(key)
+    f = _framing_entry(entry, key)
+    f.update({"category": category, "profileKey": key, "source": source})
+    return f
+
+
+def framing_all():
+    cfg = load_framing()
+    keys = sorted(set(cfg["defaults"]) | set(cfg["overrides"]))
+    return {k: framing_for(k) for k in keys}
+
+
+def framing_get(category=None):
+    cfg = load_framing()
+    if category:
+        key = _framing_key(category, strict=True)
+        default = cfg["defaults"].get(key) or _default_framing_entry(key)
+        override = cfg["overrides"].get(key)
+        return {
+            "category": category,
+            "profileKey": key,
+            "effective": framing_for(category),
+            "default": _framing_entry(default, key),
+            "override": _framing_entry(override, key) if override else None,
+        }
+    return {
+        "defaults": {k: _framing_entry(v, k) for k, v in cfg["defaults"].items()},
+        "overrides": {k: _framing_entry(v, k) for k, v in cfg["overrides"].items()},
+        "effective": framing_all(),
+    }
+
+
+def set_framing(category, updates):
+    """Écrit un override local par catégorie/partie du corps ; les defaults ne sont pas modifiés."""
+    key = _framing_key(category, strict=True)
+    cfg = load_framing()
+    current = cfg["overrides"].get(key) or cfg["defaults"].get(key) or _default_framing_entry(key)
+    merged = _framing_entry(current, key)
+    for name in ("top", "bottom", "half", "distance", "yaw", "fit"):
+        if name not in updates:
+            continue
+        if name == "half" and updates[name] is None:
+            merged["half"] = None
+        elif updates[name] is not None:
+            merged[name] = updates[name]
+    merged["top"] = float(merged["top"])
+    merged["bottom"] = float(merged["bottom"])
+    if merged["half"] is not None:
+        merged["half"] = float(merged["half"])
+    merged["distance"] = float(merged["distance"])
+    merged["yaw"] = float(merged["yaw"])
+    if not (0 <= merged["top"] < merged["bottom"] <= 1):
+        raise ValueError("top/bottom doivent vérifier 0 <= top < bottom <= 1")
+    if merged["half"] is not None and not (0.01 <= merged["half"] <= 1):
+        raise ValueError("half doit être null ou dans 0.01..1")
+    if not (1 <= merged["distance"] <= 10):
+        raise ValueError("distance doit être dans 1..10")
+    if not (-180 <= merged["yaw"] <= 180):
+        raise ValueError("yaw doit être dans -180..180 (0 = face, 90 = profil, 180 = dos)")
+    if merged["fit"] not in ("region", "full-body"):
+        raise ValueError("fit doit être region ou full-body")
+    cfg["overrides"][key] = merged
+    _save_framing(cfg)
+    return framing_get(category)
+
+
+def reset_framing(category=None):
+    """Efface les overrides (tous, ou une catégorie) : retour aux defaults commités."""
+    cfg = load_framing()
+    if category:
+        key = _framing_key(category, strict=True)
+        cfg["overrides"].pop(key, None)
+    else:
+        cfg["overrides"] = {}
+    _save_framing(cfg)
+    return framing_get(category) if category else framing_get()
+
+
+def region_for(category):
+    f = framing_for(category)
+    return f["top"], f["bottom"], f["half"]
 
 
 def now():
@@ -129,38 +352,129 @@ def _save(cat):
     os.replace(tmp, CATALOG)
 
 
-def sync(presets, unity_version=None):
-    """Fusionne la liste vivante (/presets) dans le cache sans toucher aux annotations."""
+def _new_entry(key, **kw):
+    e = {"resource": key, "thumbnail": None, "icon": None, "description": "", "tags": [], "colors": [],
+         "annotations": [], "firstSeen": now()}
+    e.update(kw)
+    return e
+
+
+def scan(presets, customs=None, unity_version=None, session=None):
+    """Compare ce que VRoid propose maintenant (presets intégrés + objets personnalisés) avec le cache.
+
+    - nouveau  : entrée créée (status "new") ;
+    - modifié  : objet personnalisé renommé ou nouvelle révision (status "changed", vignette effacée) ;
+    - retiré   : absent de VRoid (removed=true, annotations conservées ; réapparaît tel quel s'il revient).
+    Les noms des objets personnalisés sont relus à chaque scan (ce sont ceux de l'utilisateur dans VRoid).
+    Les presets intégrés n'ont pas de nom dans VRoid : leur description vient des annotations.
+    """
     with _Lock():
         cat = load()
-        added = 0
+        seen, new, changed, back = set(), [], [], []
         for p in presets:
-            res = p["resource"]
-            e = cat["presets"].get(res)
+            key = p["resource"]
+            seen.add(key)
+            e = cat["presets"].get(key)
             if e is None:
-                cat_, num = category_of(res)
-                e = {"resource": res, "category": cat_, "number": num, "thumbnail": None,
-                     "description": "", "tags": [], "colors": [], "annotations": []}
-                cat["presets"][res] = e
-                added += 1
-            e.update(id=p["id"], usable=p.get("usable", True), price=p.get("price", 0))
-        # Recalcule les champs dérivés du chemin pour toutes les entrées (migration sans perte d'annotations).
-        for res, e in cat["presets"].items():
-            e["category"], e["number"] = category_of(res)
-            e["slot"] = slot_of(res)
-        fp = hashlib.sha1("\n".join(sorted(cat["presets"])).encode()).hexdigest()[:12]
-        cat["source"] = {"app": "VRoid Studio", "unity": unity_version or cat["source"].get("unity"),
-                         "presetFingerprint": fp}
+                e = cat["presets"][key] = _new_entry(key, kind="preset", status="new")
+                new.append(key)
+            elif e.get("removed"):
+                back.append(key)
+            e.update(id=p["id"], usable=p.get("usable", True), price=p.get("price", 0), kind="preset", removed=False,
+                     lastSeen=now())
+        for c in customs or []:
+            # Clé : ressource de l'objet + nom de son fichier (deux copies enregistrées d'un même objet coexistent).
+            base = c.get("customItemResource") or c.get("resource") or ""
+            fname = os.path.basename((c.get("file") or "").replace("\\", "/"))
+            key = "custom:" + base + "#" + fname
+            seen.add(key)
+            short = (c.get("type") or "").split(".")[-1]
+            e = cat["presets"].get(key)
+            if e is None:
+                e = cat["presets"][key] = _new_entry(key, kind="custom", status="new")
+                new.append(key)
+            else:
+                if e.get("removed"):
+                    back.append(key)
+                if (e.get("revision"), e.get("name")) != (c.get("revision"), c.get("name")):
+                    e.setdefault("history", []).append({"date": now(), "name": e.get("name"), "revision": e.get("revision")})
+                    e["status"] = "changed"
+                    e["thumbnail"] = None
+                    changed.append(key)
+            e.update(kind="custom", removed=False, lastSeen=now(), name=c.get("name"), id=c.get("id"),
+                     revision=c.get("revision"), file=c.get("file"), registered=c.get("registered"),
+                     category="Custom/" + short, number=c.get("name") or "", slot=short, usable=True, price=0,
+                     groupResource=c.get("resource"))
+            if not e.get("icon") or key in changed or not os.path.exists(os.path.join(ROOT, e["icon"])):
+                e["icon"] = extract_custom_icon(e)
+        for key in [k for k, e in cat["presets"].items()
+                    if e.get("kind") == "custom" and "#" not in k and not e.get("annotations")]:
+            del cat["presets"][key]
+        removed = []
+        for key, e in cat["presets"].items():
+            if key not in seen and not e.get("removed"):
+                e["removed"] = True
+                e["removedSince"] = now()
+                removed.append(key)
+            if e.get("kind", "preset") == "preset":
+                e["category"], e["number"] = category_of(key)
+                e["slot"] = slot_of(key)
+            # Structural label immediately; when a thumbnail already exists, upgrade the
+            # label with visual metadata (colors/brightness/pattern) during the same sync.
+            if e.get("labelSource") != "manual":
+                thumb = e.get("thumbnail")
+                thumb_path = os.path.join(ROOT, thumb) if thumb else None
+                has_visual = bool((e.get("generated") or {}).get("visual"))
+                if thumb_path and os.path.exists(thumb_path) and not has_visual:
+                    labeler.apply(e, thumb_path, force=True)
+                elif not e.get("label") or key in changed:
+                    labeler.apply(e, force=key in changed and not thumb)
+        live = sorted(k for k, e in cat["presets"].items() if not e.get("removed"))
+        fp = hashlib.sha1("\n".join(live).encode()).hexdigest()[:12]
+        cat["source"] = {"app": "VRoid Studio", "unity": unity_version or cat.get("source", {}).get("unity"),
+                         "presetFingerprint": fp, "session": session or cat.get("source", {}).get("session"),
+                         "lastScan": now()}
         _save(cat)
-        return {"total": len(cat["presets"]), "added": added, "fingerprint": fp}
+        return {"total": len(live), "presets": len(presets), "customs": len(customs or []), "new": len(new),
+                "changed": changed, "removed": removed, "returned": back, "fingerprint": fp,
+                "newSample": new[:20]}
 
 
-def annotate(key, author, description=None, tags=None, colors=None, replace=False):
-    """key = chemin de ressource ou id VRoid. tags/colors sont ajoutés (ou remplacés si replace)."""
+def sync(presets, unity_version=None):
+    """Compatibilité : scan des seuls presets intégrés."""
+    return scan(presets, None, unity_version)
+
+
+def set_field(key, field, value):
+    with _Lock():
+        cat = load()
+        _find(cat, key)[field] = value
+        _save(cat)
+
+
+def set_icon(key, rel_path):
+    with _Lock():
+        cat = load()
+        e = _find(cat, key)
+        e["icon"] = rel_path.replace("\\", "/")
+        e["iconKind"] = "native"
+        e["iconAt"] = now()
+        _save(cat)
+        return e
+
+
+def annotate(key, author, description=None, tags=None, colors=None, replace=False, label=None):
+    """key = chemin de ressource ou id VRoid. tags/colors sont ajoutés (ou remplacés si replace).
+    label remplace le label généré et devient la référence humaine (labelSource=manual)."""
     with _Lock():
         cat = load()
         e = _find(cat, key)
         changed = []
+        if label is not None:
+            e["label"] = label.strip()
+            e["labelSource"] = "manual"
+            e["labelAt"] = now()
+            changed.append("label")
         if description is not None:
             e["description"] = description.strip(); changed.append("description")
         for field, vals in (("tags", tags), ("colors", colors)):
@@ -174,11 +488,19 @@ def annotate(key, author, description=None, tags=None, colors=None, replace=Fals
         return e
 
 
-def set_thumbnail(key, rel_path):
+def set_thumbnail(key, rel_path, meta=None):
     with _Lock():
         cat = load()
         e = _find(cat, key)
         e["thumbnail"] = rel_path.replace("\\", "/")
+        e["thumbnailKind"] = "situation"
+        e["thumbnailAt"] = now()
+        if meta:
+            e["thumbnailMeta"] = meta
+        try:
+            labeler.apply(e, os.path.join(ROOT, e["thumbnail"]))
+        except Exception:
+            pass  # a label is useful but must never make a thumbnail fail
         _save(cat)
         return e
 
@@ -192,34 +514,86 @@ def _find(cat, key):
     raise KeyError(f"preset absent du cache : {key} (lancer une synchro)")
 
 
-def search(query=None, category=None, usable_only=True, annotated_only=False, limit=50):
+def search(query=None, category=None, usable_only=True, annotated_only=False, limit=50, kind=None,
+           include_removed=False, status=None):
     """Recherche plein texte simple : tous les mots de la requête doivent apparaître (description, tags, couleurs,
     catégorie, numéro). Renvoie les entrées triées, les mieux annotées d'abord."""
     cat = load()
     words = [w.lower() for w in (query or "").split() if w]
     out = []
     for e in cat["presets"].values():
-        if category and category.lower() not in e["category"].lower():
+        if category and category.lower() not in e.get("category", "").lower():
+            continue
+        if kind and e.get("kind", "preset") != kind:
+            continue
+        if e.get("removed") and not include_removed:
+            continue
+        if status and e.get("status") != status:
             continue
         if usable_only and not e.get("usable", True):
             continue
         if annotated_only and not (e.get("description") or e.get("tags")):
             continue
-        hay = " ".join([e.get("description", ""), " ".join(e.get("tags", [])), " ".join(e.get("colors", [])),
-                        e["category"], e.get("number", ""), e.get("slot") or ""]).lower()
+        gen = e.get("generated") or {}
+        hay = " ".join([e.get("label", ""), e.get("description", ""), " ".join(e.get("tags", [])),
+                        " ".join(e.get("colors", [])), " ".join(gen.get("tags", [])),
+                        " ".join(gen.get("colors", [])), e.get("category", ""), e.get("number") or "",
+                        e.get("slot") or "", e.get("name") or "",
+                        e.get("kind", "preset")]).lower()
         if all(w in hay for w in words):
             out.append(e)
-    out.sort(key=lambda e: (-(len(e.get("tags", [])) + bool(e.get("description"))), e["category"], e.get("number", "")))
+    out.sort(key=lambda e: (-(len(e.get("tags", [])) + bool(e.get("description"))), e.get("category", ""),
+                            e.get("number") or ""))
     return {"total": len(out), "cacheUpdated": cat.get("updated"), "source": cat.get("source"),
             "presets": out[:limit]}
 
 
 def thumb_path(e):
-    return os.path.join(ROOT, e["thumbnail"]) if e.get("thumbnail") else None
+    """Vignette en situation (capture recadrée) si elle existe, sinon icône native de VRoid."""
+    for f in ("thumbnail", "icon"):
+        if e.get(f) and os.path.exists(os.path.join(ROOT, e[f])):
+            return os.path.join(ROOT, e[f])
+    return None
+
+
+def extract_custom_icon(e):
+    """Icône d'un objet personnalisé : le fichier .vroidcustomitem est un zip qui contient thumbnails/thumbnail.png."""
+    import zipfile
+    f = e.get("file")
+    if not f or not os.path.exists(f):
+        return None
+    try:
+        with zipfile.ZipFile(f) as z:
+            name = next((n for n in z.namelist() if n.lower().startswith("thumbnails/") and n.lower().endswith(".png")), None)
+            if not name:
+                return None
+            data = z.read(name)
+    except (zipfile.BadZipFile, OSError):
+        return None
+    rel = "icons/custom/" + hashlib.sha1(e["resource"].encode()).hexdigest()[:16] + ".png"
+    path = os.path.join(ROOT, rel)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "wb") as out:
+        out.write(data)
+    return rel
+
+
+def icon_rel(e):
+    return "icons/" + e["resource"].split("/TransferableGroupType.")[0].replace("/", "_") + ".png"
 
 
 def get(key):
     return _find(load(), key)
+
+
+def image_info(path):
+    """Dimensions, taille et empreinte d'une vignette (pour tracer sa génération dans catalog.json)."""
+    from PIL import Image
+    with Image.open(path) as im:
+        pixels = list(im.size)
+    with open(path, "rb") as f:
+        data = f.read()
+    return {"pixels": pixels, "bytes": len(data), "sha1": hashlib.sha1(data).hexdigest()}
 
 
 def crop_model(png_path, category, out_path, size=256):
@@ -254,5 +628,27 @@ def crop_model(png_path, category, out_path, size=256):
     return out_path
 
 
+def crop_center(png_path, category, out_path, size=320):
+    """Recadre le centre de la vue 3D (la caméra a été cadrée sur la zone de la catégorie)."""
+    from PIL import Image
+    im = Image.open(png_path).convert("RGB")
+    w, h = im.size
+    x0, x1, y0, y1 = int(w * 0.16), int(w * 0.87), int(h * 0.05), h   # vue 3D, sans les panneaux
+    cx, cy = (x0 + x1) // 2, (y0 + y1) // 2
+    ch = int((y1 - y0) * 0.92)
+    _, _, half = region_for(category)
+    cw = min(x1 - x0, int(ch * (1.25 if half is None else 1.0)))
+    crop = im.crop((cx - cw // 2, cy - ch // 2, cx + cw // 2, cy + ch // 2))
+    crop.thumbnail((size, size))
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    crop.save(out_path, quality=88)
+    return out_path
+
+
 def thumb_rel(e):
-    return f"thumbs/{e['category'].replace('/', '_')}/{e.get('number') or e['id'][:12]}.jpg"
+    if e.get("kind") == "custom":
+        # Plusieurs objets personnalisés portent souvent le même nom (« Shoes ») : nom de fichier unique.
+        return f"thumbs/{e['category'].replace('/', '_')}/{hashlib.sha1(e['resource'].encode()).hexdigest()[:16]}.jpg"
+    num = (e.get("number") or e.get("id") or "x")[:40]
+    num = "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in num)
+    return f"thumbs/{e['category'].replace('/', '_')}/{num}.jpg"

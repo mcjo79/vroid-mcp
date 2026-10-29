@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>VRoidMcpBridge</AssemblyName>
-    <Version>0.10.0</Version>
+    <Version>0.11.0</Version>
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -18,6 +18,8 @@
     <Reference Include="$(GameDir)\BepInEx\core\Il2CppInterop.Common.dll" Private="false" />
     <Reference Include="$(GameDir)\BepInEx\core\0Harmony.dll" Private="false" />
     <Reference Include="$(GameDir)\BepInEx\interop\Il2Cppmscorlib.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\Il2CppSystem.Core.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\Il2CppSystem.dll" Private="false" />
     <Reference Include="$(GameDir)\BepInEx\interop\UnityEngine.dll" Private="false" />
     <Reference Include="$(GameDir)\BepInEx\interop\UnityEngine.CoreModule.dll" Private="false" />
     <Reference Include="$(GameDir)\BepInEx\interop\UnityEngine.AnimationModule.dll" Private="false" />
@@ -30,10 +32,13 @@
     <Reference Include="$(GameDir)\BepInEx\interop\VRoid.UI.dll" Private="false" />
     <Reference Include="$(GameDir)\BepInEx\interop\VRoid.App.dll" Private="false" />
     <Reference Include="$(GameDir)\BepInEx\interop\PlayFab.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\VRM10.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\VRM.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\UniGLTF.dll" Private="false" />
   </ItemGroup>
 
   <!-- Copie automatique du plugin dans BepInEx\plugins après compilation -->
-  <Target Name="CopyToPlugins" AfterTargets="Build">
+  <Target Name="CopyToPlugins" AfterTargets="Build" Condition="'$(SkipCopy)' != 'true'">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(GameDir)\BepInEx\plugins\VRoidMcpBridge" />
   </Target>
 </Project>

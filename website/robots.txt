@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mcjo79.github.io/vroid-mcp/sitemap.xml

@@ -114,13 +114,13 @@ public static class Hair
     static object SafeLayers(EditableImagePath ip, Model model)
     {
         try { return Textures.LayersOfImage(ip, model); }
-        catch (Exception e) { return new { error = "texture non éditable pour l'instant", detail = e.Message.Split('\n')[0] }; }
+        catch (Exception e) { return new { error = "texture is not editable yet", detail = e.Message.Split('\n')[0] }; }
     }
 
     /// <summary>Passe un matériau de cheveux en édition de texture (bouton Éditer). Annulable.</summary>
     public static object BeginEdit(string material)
     {
-        if (string.IsNullOrEmpty(material)) throw new ArgumentException("paramètre manquant : material");
+        if (string.IsNullOrEmpty(material)) throw new ArgumentException("missing parameter: material");
         var c = Ctx();
         var cmd = new VRoidCore.Editing.History.Command.AdvancedEdit.BeginHairMaterialAdvancedEditCommand(
             new SharedHairMaterialPath(material), "Layer", true);
@@ -131,7 +131,7 @@ public static class Hair
     /// <summary>Change une couleur d'un matériau de cheveux (clé donnée par Materials). Annulable.</summary>
     public static object SetColor(string material, string key, float r, float g, float b, float a)
     {
-        if (string.IsNullOrEmpty(key)) throw new ArgumentException("paramètre manquant : key");
+        if (string.IsNullOrEmpty(key)) throw new ArgumentException("missing parameter: key");
         if (key.StartsWith("base:"))
         {
             // Couleur de superposition d'un preset : identifiant global, le matériau n'est pas nécessaire.
@@ -139,7 +139,7 @@ public static class Hair
             Ctx().ExecuteSyncCommand(cb.Cast<ISyncCommand<Context.HistoryManagerContext, Model>>());
             return new { ok = true, key, color = new { r, g, b, a } };
         }
-        if (string.IsNullOrEmpty(material)) throw new ArgumentException("paramètre manquant : material");
+        if (string.IsNullOrEmpty(material)) throw new ArgumentException("missing parameter: material");
         var c = Ctx();
         var cmd = new SetMaterialColorCommand(new SharedHairMaterialPath(material), key, new UColor(r, g, b, a));
         c.ExecuteSyncCommand(cmd.Cast<ISyncCommand<Context.HistoryManagerContext, Model>>());
