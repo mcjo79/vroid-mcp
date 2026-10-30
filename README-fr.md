@@ -8,6 +8,15 @@ Permet à une IA (Claude Code, Claude Desktop…) de lire et modifier le modèle
 IA ──MCP (stdio)──> mcp_server/vroid_mcp.py ──HTTP 127.0.0.1:7811──> plugin BepInEx (dans VRoid) ──> VRoidCore.Editing.Context
 ```
 
+## Nouveautés de la 0.14
+
+- **Curseurs de forme des vêtements et accessoires** : les curseurs *Personnaliser > Paramètres* des presets
+  (jupe plus serrée/large/courte/longue, manches, largeur, longueur, capuche…) sont maintenant lisibles et
+  réglables. `vroid_get_item_params type=<type de groupe>` les liste dans `sliders` (valeurs 0..100), et
+  `vroid_set_blendshape group=... key=template:... value=...` en règle un (annulable).
+- **53 outils** : `vroid_get_item_params` liste tous les paramètres réglables des éléments du modèle, y compris
+  les groupes que `vroid_list_groups` ne montre pas.
+
 ## Nouveautés de la 0.13
 
 - **Skill `vroid-studio`** pour Claude Code et DeepSeek Harness : un guide de travail d'une page, chargé seulement

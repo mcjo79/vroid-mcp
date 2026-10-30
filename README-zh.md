@@ -35,6 +35,11 @@ VRoidMcp-Setup-v<version>.exe /S /GAMEDIR="<VRoid Studio 文件夹>" /NOCLAUDE /
 Uninstall-VRoidMcp.exe /S /REMOVEBEPINEX /REMOVECACHE
 ```
 
+## 0.14 新功能
+
+- 服装和配饰的形状滑块（裙子收紧/放宽/缩短/加长、袖子、宽度、长度、兜帽等）现在可以读取和设置：用 `vroid_get_item_params` 的 `sliders`（0..100）读取，再把 `template:...` 键传给 `vroid_set_blendshape` 修改（可撤销）。
+- 53 个工具：新增 `vroid_get_item_params`。
+
 ## 0.13 新功能
 
 - 面向 Claude Code 和 DeepSeek Harness 的 `vroid-studio` 技能（仅在谈到 VRoid 时加载的工作指南）。

@@ -177,7 +177,12 @@ public static class VRoidApi
             }
             catch { }
 
-            result.Add(new { group = groupId, type, resource, active = active.Contains(groupId), elementCount, pars });
+            // Shape sliders of clothing/accessory presets (Customize > Parameters): template blendshapes.
+            List<object> sliders = null;
+            try { sliders = ClothingSliders.List(c, groupId); } catch { }
+
+            result.Add(new { group = groupId, type, resource, active = active.Contains(groupId), elementCount, pars,
+                             sliders = sliders ?? new List<object>() });
         }
 
         // Autre emplacement possible des réglages : les paramètres globaux du modèle.
@@ -226,12 +231,16 @@ public static class VRoidApi
 
     public static object SetBlendShape(string groupId, string key, float value)
     {
-        RequireContext();
+        var c = RequireContext();
+        // A key from vroid_get_item_params "sliders" ("template:<template>|<key>") targets a clothing
+        // preset slider; any other key is a regular blendshape of the group.
+        var path = ClothingSliders.Decode(key);
         var d = new Il2Gen.Dictionary<IBlendShapeTransformPath, float>();
-        d.Add(new BlendShapeTransformPath(key).Cast<IBlendShapeTransformPath>(), value);
+        d.Add(path, value);
         Exec(new SetBlendShapeTransformParameterCommand(groupId,
             d.Cast<Il2Gen.IEnumerable<Il2Gen.KeyValuePair<IBlendShapeTransformPath, float>>>(), true));
-        return new { ok = true, group = groupId, key, value };
+        return new { ok = true, group = groupId, key, value,
+                     readBack = ClothingSliders.Read(c, groupId, ClothingSliders.Decode(key)) };
     }
 
     public static object SetBone(string groupId, string key, float value)

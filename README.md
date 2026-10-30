@@ -8,6 +8,15 @@ Lets an AI (Claude Code, Claude Desktop…) read and edit the model open in VRoi
 AI ──MCP (stdio)──> mcp_server/vroid_mcp.py ──HTTP 127.0.0.1:7811──> BepInEx plugin (inside VRoid) ──> VRoidCore.Editing.Context
 ```
 
+## What's new in 0.14
+
+- **Clothing and accessory shape sliders**: the *Customize > Parameters* sliders of presets (skirt
+  tighter/wider/shorter/longer, sleeves, width, length, hood...) are now readable and settable.
+  `vroid_get_item_params type=<group type>` lists them in `sliders` (values 0..100), and
+  `vroid_set_blendshape group=... key=template:... value=...` sets one (undoable).
+- **53 tools**: `vroid_get_item_params` lists every adjustable parameter of the model's items, including groups
+  that `vroid_list_groups` hides.
+
 ## What's new in 0.13
 
 - **`vroid-studio` skill** for Claude Code and DeepSeek Harness: a one-page working guide, loaded only when the

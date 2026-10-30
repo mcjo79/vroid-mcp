@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
   <title>VRoid MCP Bridge — Create VRoid characters in batches</title>
-  <meta name="description" content="Create VRoid character variants in batches with Claude: drive VRoid Studio, change presets, textures and colors, and export VRM without clicking. 52 MCP tools, undoable, installed in minutes.">
+  <meta name="description" content="Create VRoid character variants in batches with Claude: drive VRoid Studio, change presets, textures and colors, and export VRM without clicking. 53 MCP tools, undoable, installed in minutes.">
   <meta name="author" content="mcjo79">
   <link rel="canonical" href="https://mcjo79.github.io/vroid-mcp/">
   <link rel="alternate" hreflang="en" href="https://mcjo79.github.io/vroid-mcp/">
@@ -19,7 +19,7 @@
   <meta property="og:locale:alternate" content="fr_FR">
   <meta property="og:site_name" content="VRoid MCP Bridge">
   <meta property="og:title" content="VRoid MCP Bridge — Create VRoid characters in batches">
-  <meta property="og:description" content="Create VRoid character variants in batches with Claude. Presets, textures, colors and native VRM export — 52 MCP tools, undoable.">
+  <meta property="og:description" content="Create VRoid character variants in batches with Claude. Presets, textures, colors and native VRM export — 53 MCP tools, undoable.">
   <meta property="og:url" content="https://mcjo79.github.io/vroid-mcp/">
   <meta property="og:image" content="https://mcjo79.github.io/vroid-mcp/assets/img/og-image.jpg">
   <meta property="og:image:width" content="1200">
@@ -27,7 +27,7 @@
   <meta property="og:image:alt" content="VRoid MCP Bridge: a young Japanese businesswoman with purple hair and a dark green suit, created with the MCP bridge.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="VRoid MCP Bridge — Create VRoid characters in batches">
-  <meta name="twitter:description" content="Create VRoid character variants in batches with Claude. 52 MCP tools, native VRM export, undoable edits.">
+  <meta name="twitter:description" content="Create VRoid character variants in batches with Claude. 53 MCP tools, native VRM export, undoable edits.">
   <meta name="twitter:image" content="https://mcjo79.github.io/vroid-mcp/assets/img/og-image.jpg">
 
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
@@ -65,7 +65,7 @@
     "description": "Local MCP bridge to read and edit the model open in VRoid Studio from an AI.",
     "url": "https://mcjo79.github.io/vroid-mcp/",
     "codeRepository": "https://github.com/mcjo79/vroid-mcp",
-    "softwareVersion": "0.13.0",
+    "softwareVersion": "0.14.0",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
     "license": "https://github.com/mcjo79/vroid-mcp"
   }
@@ -128,7 +128,7 @@
           <p class="lede">Build, dress, texture and export VRoid character variants from Claude — without clicking through the editor. Undoable, scriptable, and installed in minutes. Works with Claude Code, Claude Desktop, or any MCP client; no protocol knowledge required.</p>
           <div class="hero-cta">
             <a class="btn btn-primary" href="#batch">See a batch example</a>
-            <a class="btn btn-secondary" href="#prerequisites">Download v0.13.0</a>
+            <a class="btn btn-secondary" href="#prerequisites">Download v0.14.0</a>
           </div>
           <ul class="hero-meta" aria-label="Compatibility">
             <li><span class="status-dot"></span>BepInEx 6 · IL2CPP</li>
@@ -151,7 +151,7 @@
 
       <div class="container">
         <dl class="stats" data-reveal>
-          <div><dt>MCP tools</dt><dd>52</dd></div>
+          <div><dt>MCP tools</dt><dd>53</dd></div>
           <div><dt>VRoid presets</dt><dd>1,750</dd></div>
           <div><dt>Categories</dt><dd>50</dd></div>
           <div><dt>Server dependencies</dt><dd>0</dd></div>
@@ -436,7 +436,7 @@
   <div class="container">
     <header class="section-head" data-reveal>
       <p class="eyebrow"><span class="eyebrow-num">06</span>Tools</p>
-      <h2>52 tools.</h2>
+      <h2>53 tools.</h2>
       <p class="lede">Tool names and arguments are English; this index is generated from the live MCP registry.</p>
     </header>
     <div class="tools-toolbar" data-reveal>
@@ -444,7 +444,7 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
         <input id="toolSearch" type="search" placeholder="Filter: texture, hair, preset, VRM…" autocomplete="off">
       </label>
-      <p class="tools-count" id="toolsCount" aria-live="polite">52 tools</p>
+      <p class="tools-count" id="toolsCount" aria-live="polite">53 tools</p>
     </div>
     <div class="tools" id="tools" data-reveal>
       <details class="tool-group" open>
@@ -493,6 +493,7 @@
           <tr data-tool="vroid_categories List categories in a section (or all categories), with category key, label,"><td><code>vroid_categories</code></td><td>List categories in a section (or all categories), with category key, label, section and group count. Use with vroid_enter / vroid_set_param.</td></tr>
           <tr data-tool="vroid_enter Select a section/category by name and return its group and enriched parameters"><td><code>vroid_enter</code></td><td>Select a section/category by name and return its group and enriched parameters (labels + stable section/category/key paths). Equivalent in spirit to…</td></tr>
           <tr data-tool="vroid_get_params List the parameters of a group (blendshape sliders, bones, colors) with their"><td><code>vroid_get_params</code></td><td>List the parameters of a group (blendshape sliders, bones, colors) with their current values.</td></tr>
+          <tr data-tool="vroid_get_item_params List every adjustable parameter of the model&#x27;s items, including the shape slider"><td><code>vroid_get_item_params</code></td><td>List every adjustable parameter of the model's items, including the shape sliders VRoid shows under Customize &gt; Parameters for clothing and accessories (skirt tighter/wider/shorter/longer, sleeve thickness, width, length, hood...), which vroid_get_params does not return. Each group has 'pars' (regular parameters) and 'sliders' (key, label, value). Clothing sliders range 0..100 (not 0..1); the last word of the label says what they do (Narrow = tighter, Spread = wider, Short, Long...). Set one with vroid_set_blendshape group=&lt;group&gt; key=&lt;slider key&gt; value=&lt;0..100&gt;; undoable. 'type' filters by group type, e.g. TransferableGroupType.N00.Level1.Bottoms.</td></tr>
           <tr data-tool="vroid_set_param Set a parameter by section/category and key or short label; dispatches to"><td><code>vroid_set_param</code></td><td>Set a parameter by section/category and key or short label; dispatches to bone, blendshape or color. Accepts numbers, #RRGGBB or r,g,b for colors. Un…</td></tr>
           <tr data-tool="vroid_set_blendshape Set a shape slider (blendshape) of a group. Undoable in VRoid (Ctrl+Z)."><td><code>vroid_set_blendshape</code></td><td>Set a shape slider (blendshape) of a group. Undoable in VRoid (Ctrl+Z).</td></tr>
           <tr data-tool="vroid_set_bone Set a bone transform parameter (body proportions, size...)."><td><code>vroid_set_bone</code></td><td>Set a bone transform parameter (body proportions, size...).</td></tr>
@@ -566,7 +567,7 @@
       <p class="lede">Clear boundaries: shipped tools, work in progress, and research that is not available yet.</p>
     </header>
     <div class="features">
-<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">●</span><p class="eyebrow">Now · Shipped</p><p>52 MCP tools, native VRM export, batch operations, a four-language Windows installer with Python 3.12/NumPy/Pillow, DeepSeek Harness support, VRoid 2.16 first-load handling and preset-cache protection.</p></article>
+<article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">●</span><p class="eyebrow">Now · Shipped</p><p>53 MCP tools, native VRM export, batch operations, a four-language Windows installer with Python 3.12/NumPy/Pillow, DeepSeek Harness support, VRoid 2.16 first-load handling and preset-cache protection.</p></article>
 <article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">◐</span><p class="eyebrow">Next · In progress</p><p>Clothing texture recipes, batch presets, more examples and documentation.</p></article>
 <article class="feature" data-reveal><span class="feature-icon" aria-hidden="true">○</span><p class="eyebrow">Research · Not shipped</p><p>ComfyUI texture workflows, a specialized LoRA, and community evaluation. Collaboration welcome — no promises yet.</p></article>
     </div>
@@ -624,7 +625,7 @@
           </details>
           <details class="info-block">
             <summary>Agent reference (English)</summary>
-            <p>For an AI agent using this server through DeepSeek Harness or another MCP client, the complete English reference — 52 tools, every category and parameter, physical sliders and expression limits — is <a href="https://github.com/mcjo79/vroid-mcp/blob/main/docs/AGENT_REFERENCE_EN.md">docs/AGENT_REFERENCE_EN.md</a>. It is also exposed on demand as MCP resources under <code>vroid://agent/</code>.</p>
+            <p>For an AI agent using this server through DeepSeek Harness or another MCP client, the complete English reference — 53 tools, every category and parameter, physical sliders and expression limits — is <a href="https://github.com/mcjo79/vroid-mcp/blob/main/docs/AGENT_REFERENCE_EN.md">docs/AGENT_REFERENCE_EN.md</a>. It is also exposed on demand as MCP resources under <code>vroid://agent/</code>.</p>
           </details>
           <details class="info-block">
             <summary>Why a BepInEx plugin?</summary>
@@ -669,7 +670,7 @@
           <table>
             <tbody>
               <tr><th scope="row">VRoid Studio</th><td>2.16.0</td><th scope="row">Unity</th><td>6000.0.62f1</td></tr>
-              <tr><th scope="row">BepInEx</th><td>6.0.0-be.791 (IL2CPP)</td><th scope="row">Plugin</th><td>0.13.0</td></tr>
+              <tr><th scope="row">BepInEx</th><td>6.0.0-be.791 (IL2CPP)</td><th scope="row">Plugin</th><td>0.14.0</td></tr>
               <tr><th scope="row">MCP server</th><td>Python 3.12 embedded, NumPy/Pillow</td><th scope="row">System</th><td>Windows 10 / 11</td></tr>
             </tbody>
           </table>
@@ -726,7 +727,7 @@
           <p>Download the release, run the installer, restart Claude (or any MCP client).</p>
         </div>
         <div class="cta-band-actions">
-          <a class="btn btn-primary" href="https://github.com/mcjo79/vroid-mcp/releases/latest" target="_blank" rel="noopener">Download v0.13.0</a>
+          <a class="btn btn-primary" href="https://github.com/mcjo79/vroid-mcp/releases/latest" target="_blank" rel="noopener">Download v0.14.0</a>
           <a class="btn btn-secondary" href="https://github.com/mcjo79/vroid-mcp" target="_blank" rel="noopener">View the code</a>
         </div>
       </div>
@@ -765,7 +766,7 @@
       </nav>
       <div class="footer-col">
         <h3>Status</h3>
-        <p class="footer-status"><span class="status-dot"></span>v0.13.0 · public</p>
+        <p class="footer-status"><span class="status-dot"></span>v0.14.0 · public</p>
         <p>Site last updated: October 2026.</p>
       </div>
     </div>

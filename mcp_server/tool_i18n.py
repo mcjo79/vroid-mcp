@@ -60,13 +60,8 @@ EN_TOOL_DESCRIPTIONS = {
                        "or color. Accepts numbers, #RRGGBB or r,g,b for colors. Unified counterpart of "
                        "vroid_set_bone / vroid_set_blendshape / vroid_set_color.",
     "vroid_get_params": "List the parameters of a group (blendshape sliders, bones, colors) with their current values.",
-    "vroid_get_item_params": "List every adjustable parameter of the model's items, including the ones VRoid shows "
-                             "under Customize > Parameters for clothing (skirt tighter/wider/shorter/longer, sleeve "
-                             "length, collar...) but which live outside the outfit groups: vroid_list_groups and "
-                             "vroid_get_params do not see them. Returns groups (type, active flag, number of "
-                             "editable elements, current values) and the model's global parameters. Set one with "
-                             "vroid_set_blendshape or vroid_set_bone using the returned group id and key.",
-    "vroid_set_blendshape": "Set a shape slider (blendshape) of a group. Undoable in VRoid (Ctrl+Z).",
+    "vroid_get_item_params": "List every adjustable parameter of the model's items, including the shape sliders VRoid shows under Customize > Parameters for clothing and accessories (skirt tighter/wider/shorter/longer, sleeve thickness, width, length, hood...), which vroid_get_params does not return. Each group has 'pars' (regular parameters) and 'sliders' (key, label, value). Clothing sliders range 0..100 (not 0..1); the last word of the label says what they do (Narrow = tighter, Spread = wider, Short, Long...). Set one with vroid_set_blendshape group=<group> key=<slider key> value=<0..100>; undoable. 'type' filters by group type, e.g. TransferableGroupType.N00.Level1.Bottoms.",
+    "vroid_set_blendshape": "Set a shape slider (blendshape) of a group. Undoable in VRoid (Ctrl+Z). Also sets clothing/accessory preset sliders: pass a 'template:...' key from vroid_get_item_params (values 0..100). Returns the value read back from VRoid.",
     "vroid_set_bone": "Set a bone transform parameter (body proportions, size...).",
     "vroid_set_color": "Set a color (components 0..1). Undoable in VRoid.",
     "vroid_colorize": "Composite color pass: apply one color to both the global/material colors and the texture layers "
@@ -163,6 +158,9 @@ EN_TOOL_DESCRIPTIONS = {
 }
 
 EN_ARG_DESCRIPTIONS = {
+    "clé du paramètre (voir vroid_get_params) ou clé 'template:...' d'un curseur de vêtement (voir vroid_get_item_params)":
+        "parameter key (see vroid_get_params), or the 'template:...' key of a clothing slider (see vroid_get_item_params)",
+    "nouvelle valeur (0..1 ; 0..100 pour un curseur de vêtement)": "new value (0..1; 0..100 for a clothing slider)",
     "0..100 (défaut 100)": "0..100 (default 100)",
     "abandonner les modifications non sauvegardées": "discard unsaved changes",
     "ajouter comme nouveau calque au lieu de remplacer": "add as a new layer instead of replacing",

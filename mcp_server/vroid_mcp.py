@@ -317,12 +317,7 @@ TOOLS = [
     },
     {
         "name": "vroid_get_item_params",
-        "description": "List every adjustable parameter of the model's items, including the ones VRoid shows "
-                       "under Customize > Parameters for clothing (skirt tighter/wider/shorter/longer, sleeve "
-                       "length, collar...) but which live outside the outfit groups: vroid_list_groups and "
-                       "vroid_get_params do not see them. Returns groups (type, active flag, number of editable "
-                       "elements, current values) and the model's global parameters. Set one with "
-                       "vroid_set_blendshape or vroid_set_bone using the returned group id and key.",
+        "description": "List every adjustable parameter of the model's items, including the shape sliders VRoid shows under Customize > Parameters for clothing and accessories (skirt tighter/wider/shorter/longer, sleeve thickness, width, length, hood...), which vroid_get_params does not return. Each group has 'pars' (regular parameters) and 'sliders' (key, label, value). Clothing sliders range 0..100 (not 0..1); the last word of the label says what they do (Narrow = tighter, Spread = wider, Short, Long...). Set one with vroid_set_blendshape group=<group> key=<slider key> value=<0..100>; undoable. 'type' filters by group type, e.g. TransferableGroupType.N00.Level1.Bottoms.",
         "inputSchema": {"type": "object", "properties": {
             "type": _str("optional group type filter, e.g. TransferableGroupType.N00.Level1.Bottoms")}},
     },
@@ -365,8 +360,9 @@ TOOLS = [
         "name": "vroid_set_blendshape",
         "description": "Règle un curseur de forme (blendshape) d'un groupe. Annulable dans VRoid (Ctrl+Z).",
         "inputSchema": {"type": "object", "properties": {
-            "group": _str("id du groupe"), "key": _str("clé du paramètre (voir vroid_get_params)"),
-            "value": _num("nouvelle valeur")}, "required": ["group", "key", "value"]},
+            "group": _str("id du groupe"),
+            "key": _str("clé du paramètre (voir vroid_get_params) ou clé 'template:...' d'un curseur de vêtement (voir vroid_get_item_params)"),
+            "value": _num("nouvelle valeur (0..1 ; 0..100 pour un curseur de vêtement)")}, "required": ["group", "key", "value"]},
     },
     {
         "name": "vroid_set_bone",

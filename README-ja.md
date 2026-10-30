@@ -35,6 +35,11 @@ VRoidMcp-Setup-v<version>.exe /S /GAMEDIR="<VRoid Studio フォルダー>" /NOCL
 Uninstall-VRoidMcp.exe /S /REMOVEBEPINEX /REMOVECACHE
 ```
 
+## 0.14 の新機能
+
+- 衣装・アクセサリーの形状スライダー（スカートの細く/広く/短く/長く、袖、幅、丈、フードなど）を読み書きできるようになりました。`vroid_get_item_params` の `sliders`（0..100）で取得し、`vroid_set_blendshape` に `template:...` キーを渡して変更します（元に戻せます）。
+- 53 ツール：新しい `vroid_get_item_params`。
+
 ## 0.13 の新機能
 
 - Claude Code と DeepSeek Harness 向けの `vroid-studio` スキル（VRoid の話題のときだけ読み込まれる作業ガイド）。
