@@ -55,7 +55,7 @@ Uninstall-VRoidMcp.exe /S /REMOVEBEPINEX /REMOVECACHE
 安装后，启动 VRoid Studio，再重启 Claude Code / Claude Desktop / DeepSeek Harness，然后直接用中文提出请求，例如“检查 VRoid 是否响应”。
 助手会自动获得：服务器说明、`vroid-studio` 技能（`~/.claude/skills` 和 `~/.dsh/skills`）、MCP 资源 `vroid://agent/...`，以及提示词 `start`、`character`、`export_vrm`、`help`。
 
-## 主要功能（52 个工具）
+## 主要功能（53 个工具）
 
 - 分区/类别/参数的读取与编辑
 - 贴图与图层导出、重新导入、改色
@@ -66,7 +66,7 @@ Uninstall-VRoidMcp.exe /S /REMOVEBEPINEX /REMOVECACHE
 
 ## 文档
 
-- **面向代理的英文参考**: [AGENT_REFERENCE_EN.md](docs/AGENT_REFERENCE_EN.md) — 52 个工具、每个分区/类别的参数、身体尺寸和表情限制
+- **面向代理的英文参考**: [AGENT_REFERENCE_EN.md](docs/AGENT_REFERENCE_EN.md) — 53 个工具、每个分区/类别的参数、身体尺寸和表情限制
 - [MCP 参考](docs/REFERENCE.md)（法语）
 - [贴图编辑](docs/TEXTURES.md)（法语）
 - [网站](https://mcjo79.github.io/vroid-mcp/zh/)

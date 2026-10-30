@@ -46,7 +46,9 @@ stay English.
 Inspect, change one thing, look, continue:
 
 1. Find the control: `vroid_sections`, `vroid_categories section=...`, `vroid_enter section=... category=...`,
-   `vroid_get_params group=...`.
+   `vroid_get_params group=...`. Clothing groups only expose their colors: `vroid_get_item_params` lists every
+   parameter VRoid actually exposes, including groups `vroid_list_groups` hides (preset-template sliders such as
+   skirt length or sleeve length are not exposed; do not promise them).
 2. Change it: `vroid_set_param` (sliders and colors by section/category/param), or the lower-level
    `vroid_set_bone`, `vroid_set_blendshape`, `vroid_set_color`.
 3. Look: `vroid_screenshot` (clean 3D view). Frame first with `vroid_camera` for face or detail work.

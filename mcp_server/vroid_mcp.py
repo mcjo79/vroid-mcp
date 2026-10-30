@@ -61,7 +61,7 @@ AGENT_RESOURCE_GROUPS = (
      "Preset categories, replacement slots and whole-set behavior.",
      ("Preset categories and replacement slots",)),
     ("tools", "Agent Reference — All MCP tools",
-     "All 52 tools with descriptions, argument schemas and constraints.",
+     "All 53 tools with descriptions, argument schemas and constraints.",
      ("Complete MCP tool reference",)),
     ("workflows", "Agent Reference — Workflows and value rules",
      "Normalized 0..1 rules, paired sliders and agent workflows.",
@@ -314,6 +314,17 @@ TOOLS = [
         "name": "vroid_get_params",
         "description": "Liste les paramètres d'un groupe (curseurs blendshape, os, couleurs) avec leur valeur actuelle.",
         "inputSchema": {"type": "object", "properties": {"group": _str("id du groupe")}, "required": ["group"]},
+    },
+    {
+        "name": "vroid_get_item_params",
+        "description": "List every adjustable parameter of the model's items, including the ones VRoid shows "
+                       "under Customize > Parameters for clothing (skirt tighter/wider/shorter/longer, sleeve "
+                       "length, collar...) but which live outside the outfit groups: vroid_list_groups and "
+                       "vroid_get_params do not see them. Returns groups (type, active flag, number of editable "
+                       "elements, current values) and the model's global parameters. Set one with "
+                       "vroid_set_blendshape or vroid_set_bone using the returned group id and key.",
+        "inputSchema": {"type": "object", "properties": {
+            "type": _str("optional group type filter, e.g. TransferableGroupType.N00.Level1.Bottoms")}},
     },
     {
         "name": "vroid_sections",
@@ -1672,6 +1683,9 @@ def run_tool(name, args):
         return call_bridge("/groups")
     if name == "vroid_get_params":
         return call_bridge("/params", query={"group": args["group"]})
+    if name == "vroid_get_item_params":
+        q = {"type": args["type"]} if args.get("type") else {}
+        return call_bridge("/item_params", query=q)
     if name == "vroid_sections":
         return _sections()
     if name == "vroid_categories":
@@ -1737,7 +1751,7 @@ def handle(msg):
         return {
             "protocolVersion": params.get("protocolVersion", PROTOCOL_VERSION),
             "capabilities": {"tools": {}, "prompts": {}, "resources": {}},
-            "serverInfo": {"name": "vroid-studio", "version": "0.13.0"},
+            "serverInfo": {"name": "vroid-studio", "version": "0.14.0"},
             "instructions": help_i18n.INITIALIZE_INSTRUCTIONS,
         }
     if method == "ping":

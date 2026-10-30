@@ -98,6 +98,7 @@ public class HttpBridge
                 "/selftest" => await MainThread.Run(VRoidApi.SelfTest),
                 "/groups" => await MainThread.Run(VRoidApi.Groups),
                 "/params" => await MainThread.Run(() => VRoidApi.Params(Q("group"))),
+                "/item_params" => await MainThread.Run(() => VRoidApi.ItemParameters(Q("type"))),
                 "/set_blendshape" => await MainThread.Run(() => VRoidApi.SetBlendShape(Q("group"), Q("key"), F("value"))),
                 "/set_bone" => await MainThread.Run(() => VRoidApi.SetBone(Q("group"), Q("key"), F("value"))),
                 "/set_color" => await MainThread.Run(() => VRoidApi.SetColor(Q("group"), Q("key"), F("r"), F("g"), F("b"), F("a", 1f))),

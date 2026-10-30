@@ -156,7 +156,7 @@ La documentation est aussi disponible en japonais et en chinois simplifié (voir
 
 Pour un agent qui utilise le serveur via MCP (DeepSeek Harness inclus), voir
 [`docs/AGENT_REFERENCE_EN.md`](docs/AGENT_REFERENCE_EN.md) : la référence anglaise
-complète, avec les 52 outils et tous les paramètres par section/catégorie, les
+complète, avec les 53 outils et tous les paramètres par section/catégorie, les
 paramètres physiques et les limites des expressions faciales. Elle est générée
 depuis le registre vivant avec `python tools/gen_agent_reference_en.py`. Harness reçoit
 le contrat court via MCP `initialize`, les schémas des outils via `tools/list`, et cette
@@ -211,7 +211,7 @@ informations propres à un vêtement (vignette, description, tags, couleurs, mé
 
 ## Outils exposés
 
-52 outils `vroid_*` (aide, lot, cycle de vie, **export VRM**, cadrage, paramètres, couleurs, calques, cheveux,
+53 outils `vroid_*` (aide, lot, cycle de vie, **export VRM**, cadrage, paramètres, couleurs, calques, cheveux,
 presets, taille, caméra, captures...) : liste complète et description dans `docs/REFERENCE.md`. Les outils de
 cycle de vie sont `vroid_create`, `vroid_open`, `vroid_save`, `vroid_main_menu` et `vroid_exit` ; le cadrage se
 règle avec `vroid_framing_get/set/reset` ; `vroid_status` indique aussi le fichier courant et l'état modifié.

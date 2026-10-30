@@ -1,10 +1,10 @@
 # Référence du pont MCP VRoid
 
-Mise à jour manuelle du 2026-10-30 pour VRoidMcpBridge 0.13.0 (Unity 6000.0.62f1) ;
+Mise à jour manuelle du 2026-10-30 pour VRoidMcpBridge 0.14.0 (Unity 6000.0.62f1) ;
 à régénérer avec `tools/gen_reference.py` VRoid ouvert.
 
 Voir aussi `docs/TEXTURES.md` pour l'édition des textures et de leurs calques.
-La référence anglaise destinée aux agents (52 outils, toutes les sections/catégories, paramètres physiques et expressions) est [`docs/AGENT_REFERENCE_EN.md`](AGENT_REFERENCE_EN.md).
+La référence anglaise destinée aux agents (53 outils, toutes les sections/catégories, paramètres physiques et expressions) est [`docs/AGENT_REFERENCE_EN.md`](AGENT_REFERENCE_EN.md).
 
 ## Outils MCP
 
@@ -25,6 +25,7 @@ La référence anglaise destinée aux agents (52 outils, toutes les sections/cat
 | `vroid_enter` | Sélectionne une section/catégorie par nom et renvoie le groupe + les paramètres enrichis (`label`, chemin stable `section/category/key`). Ne change pas l'onglet VRoid. |
 | `vroid_set_param` | Règle un paramètre par section/catégorie et clé/libellé court ; dispatche vers os, blendshape ou couleur. Accepte `#RRGGBB` ou `r,g,b` pour les couleurs. Équivalent unifié de `vroid_set_bone` / `vroid_set_blendshape` / `vroid_set_color`. |
 | `vroid_get_params` | Liste les paramètres d'un groupe (curseurs blendshape, os, couleurs) avec leur valeur actuelle. |
+| `vroid_get_item_params` | Liste tous les paramètres réglables des éléments du modèle, y compris les groupes que `vroid_list_groups` ne montre pas : type, indicateur actif, nombre d'éléments éditables, valeurs courantes, plus les paramètres globaux du modèle. `type` filtre par type de groupe (ex. `TransferableGroupType.N00.Level1.Bottoms`). Les curseurs de préréglage (longueur de jupe, manches, largeur d'épaules) ne sont pas exposés par VRoid et restent hors de portée. |
 | `vroid_set_blendshape` | Règle un curseur de forme (blendshape) d'un groupe. Annulable dans VRoid (Ctrl+Z). |
 | `vroid_set_bone` | Règle un paramètre de transformation d'os (proportions du corps, taille...). |
 | `vroid_set_color` | Règle une couleur (composantes 0..1). Annulable dans VRoid. |

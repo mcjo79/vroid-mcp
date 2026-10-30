@@ -55,7 +55,7 @@ Uninstall-VRoidMcp.exe /S /REMOVEBEPINEX /REMOVECACHE
 インストール後、VRoid Studio を起動し、Claude Code / Claude Desktop / DeepSeek Harness を再起動して、「VRoid が応答するか確認して」のように日本語で依頼します。
 アシスタントには、サーバーの指示、`vroid-studio` スキル（`~/.claude/skills` と `~/.dsh/skills`）、MCP リソース `vroid://agent/...`、プロンプト（`start`・`character`・`export_vrm`・`help`）が自動で提供されます。
 
-## 主な機能（52 ツール）
+## 主な機能（53 ツール）
 
 - セクション／カテゴリ／パラメータの読み取りと編集
 - テクスチャとレイヤーの書き出し・再読み込み・色変更
@@ -66,7 +66,7 @@ Uninstall-VRoidMcp.exe /S /REMOVEBEPINEX /REMOVECACHE
 
 ## ドキュメント
 
-- **エージェント向け英語リファレンス**: [AGENT_REFERENCE_EN.md](docs/AGENT_REFERENCE_EN.md) — 52 ツール、全セクション／カテゴリのパラメータ、身体寸法、表情の制限
+- **エージェント向け英語リファレンス**: [AGENT_REFERENCE_EN.md](docs/AGENT_REFERENCE_EN.md) — 53 ツール、全セクション／カテゴリのパラメータ、身体寸法、表情の制限
 - [MCP リファレンス](docs/REFERENCE.md)（フランス語）
 - [テクスチャ編集](docs/TEXTURES.md)（フランス語）
 - [Web サイト](https://mcjo79.github.io/vroid-mcp/ja/)

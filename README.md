@@ -153,7 +153,7 @@ The reference and `docs/TEXTURES.md` are written in French. Documentation is als
 
 For an AI agent using the server through MCP (including DeepSeek Harness), see
 [`docs/AGENT_REFERENCE_EN.md`](docs/AGENT_REFERENCE_EN.md): the complete English
-agent reference covering all 52 tools and every section/category parameter, with
+agent reference covering all 53 tools and every section/category parameter, with
 physical parameters and facial-expression limits. It is generated from the live
 registry with `python tools/gen_agent_reference_en.py`. Harness receives the short
 contract through MCP `initialize`, all tool schemas through `tools/list`, and this
@@ -207,7 +207,7 @@ Per-item facts (thumbnail, description, tags, colors, mannequin/capture metadata
 
 ## Exposed tools
 
-52 `vroid_*` tools (help, batch, lifecycle, **VRM export**, framing, parameters, colors, layers, hair, presets,
+53 `vroid_*` tools (help, batch, lifecycle, **VRM export**, framing, parameters, colors, layers, hair, presets,
 body size, camera, screenshots…): full list and descriptions in `docs/REFERENCE.md`. The lifecycle tools are
 `vroid_create`, `vroid_open`, `vroid_save`, `vroid_main_menu` and `vroid_exit`; framing is configured by
 `vroid_framing_get/set/reset`; `vroid_status` also reports the current file and the dirty flag.

@@ -60,6 +60,12 @@ EN_TOOL_DESCRIPTIONS = {
                        "or color. Accepts numbers, #RRGGBB or r,g,b for colors. Unified counterpart of "
                        "vroid_set_bone / vroid_set_blendshape / vroid_set_color.",
     "vroid_get_params": "List the parameters of a group (blendshape sliders, bones, colors) with their current values.",
+    "vroid_get_item_params": "List every adjustable parameter of the model's items, including the ones VRoid shows "
+                             "under Customize > Parameters for clothing (skirt tighter/wider/shorter/longer, sleeve "
+                             "length, collar...) but which live outside the outfit groups: vroid_list_groups and "
+                             "vroid_get_params do not see them. Returns groups (type, active flag, number of "
+                             "editable elements, current values) and the model's global parameters. Set one with "
+                             "vroid_set_blendshape or vroid_set_bone using the returned group id and key.",
     "vroid_set_blendshape": "Set a shape slider (blendshape) of a group. Undoable in VRoid (Ctrl+Z).",
     "vroid_set_bone": "Set a bone transform parameter (body proportions, size...).",
     "vroid_set_color": "Set a color (components 0..1). Undoable in VRoid.",

@@ -26,7 +26,7 @@ class ToolMetadataTests(unittest.TestCase):
     def test_unique_tool_names(self):
         names = [t["name"] for t in vroid_mcp.TOOLS]
         self.assertEqual(len(names), len(set(names)))
-        self.assertEqual(len(names), 52)
+        self.assertEqual(len(names), 53)
 
     def test_all_tools_have_english_descriptions(self):
         self.assertEqual(vroid_mcp._MISSING_EN, [])

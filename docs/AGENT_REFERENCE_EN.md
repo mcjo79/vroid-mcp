@@ -1,12 +1,12 @@
 # VRoid MCP Bridge — Agent Reference (English)
 
-Version 0.13.0 · generated from the live MCP tool registry and a model-open N00 session.
+Version 0.14.0 · generated from the live MCP tool registry and a model-open N00 session.
 
 Audience: an AI agent using the **`vroid`** MCP server through DeepSeek Harness (or any MCP client). It assumes no access to the VRoid Studio or VRoid MCP source code. The server, plugin, Python runtime and client integration are already installed.
 
 ## What is available
 
-- **52 MCP tools** named `vroid_*`; names, arguments and JSON schemas are available from the client's `tools/list`.
+- **53 MCP tools** named `vroid_*`; names, arguments and JSON schemas are available from the client's `tools/list`.
 - **One open model at a time**. Edits are real VRoid edits, undoable with Ctrl+Z / `vroid_undo`.
 - **`vroid_help`** works without VRoid and supports `en`, `fr`, `ja`, `zh-CN`; topics: `overview`, `tools`, `lifecycle`, `export`, `framing`, `thumbnails`, `colors`, `outfit`, `sessions`, `errors`, `languages`, `batch`.
 - **Preset cache tools** can search without VRoid; `vroid_preset_cache_*` does not require an open model.
@@ -521,6 +521,9 @@ Clothes have **no numeric slider group** in VRoid. The VRoid `Outfit` tab is a s
 | Simple preset | change the garment / shoes / socks | `vroid_list_presets(filter='Tops'|'Bottoms'|'Onepiece'|'Shoes'|'Socks')`, `vroid_apply_preset`, `vroid_apply_custom`, `vroid_remove_item` |
 | Simple color | change a preset's exposed color slots | `vroid_clothing_colors(group=...)`, `vroid_set_color(group=..., key=..., r,g,b)` |
 | Complex texture | recolor a layer, export/import a PNG | `vroid_begin_clothing_edit(group=...)`, `vroid_list_layers`, `vroid_recolor_layer`, `vroid_export_layer`, `vroid_import_layer` |
+| Preset parameters | skirt/sleeve/shoulder size sliders shown in Customize; stored in the preset template, not exposed | `vroid_get_item_params` (diagnostic) |
+
+Clothing presets can also show **Parameters** in VRoid's Customize panel (skirt tighter/wider/shorter/longer, sleeve length, shoulder width, collar flatness...). They are **not model parameters**: the `.vroid` file keeps them as preset-template entries (element keys such as `BlendShape_BlendShape.N00_001_03_Bottoms.Narrow`, blendshape paths such as `Model.N00.UniformSkirt.BlendShape.Narrow`), and VRoid does not register them in `TransferableGroups`. `vroid_get_params` therefore returns only the item's `Common.Color.Base` and `Common.Color.Shade`. `vroid_get_item_params` lists every parameter VRoid does expose (including groups missing from `vroid_list_groups`) plus the model's global parameters; at the time of writing the preset parameters are not among them.
 
 `Onepiece` replaces Tops and Bottoms; `ClothingSet` can replace the whole outfit. After any whole-set apply, call `vroid_list_groups` because the number and ids of clothing groups can change. `InnerTop` / `InnerBottom` are separate layers, not underwear color sliders.
 
@@ -722,7 +725,7 @@ Use `vroid_list_presets(filter=...)` to search by category or resource path, `vr
 
 ## Complete MCP tool reference
 
-The server exposes **52 tools**. This is the authoritative list; the same descriptions and JSON schemas are available to the client through MCP `tools/list`.
+The server exposes **53 tools**. This is the authoritative list; the same descriptions and JSON schemas are available to the client through MCP `tools/list`.
 
 Tool names and arguments are always English. `vroid_help` is the only tool that works without VRoid; all others need VRoid Studio running with the bridge loaded.
 
@@ -871,6 +874,14 @@ List the parameters of a group (blendshape sliders, bones, colors) with their cu
 | Argument | Type | Required | Description | Constraints |
 |---|---|---|---|---|
 | `group` | string | yes | group id |  |
+
+### `vroid_get_item_params`
+
+List every adjustable parameter of the model's items, including the ones VRoid shows under Customize > Parameters for clothing (skirt tighter/wider/shorter/longer, sleeve length, collar...) but which live outside the outfit groups: vroid_list_groups and vroid_get_params do not see them. Returns groups (type, active flag, number of editable elements, current values) and the model's global parameters. Set one with vroid_set_blendshape or vroid_set_bone using the returned group id and key.
+
+| Argument | Type | Required | Description | Constraints |
+|---|---|---|---|---|
+| `type` | string | no | optional group type filter, e.g. TransferableGroupType.N00.Level1.Bottoms |  |
 
 ### `vroid_sections`
 
@@ -1355,4 +1366,4 @@ vroid_face_preview(name='', weight=0)      # reset
 python tools/gen_agent_reference_en.py
 ```
 
-_Generated 2026-10-30 from VRoid MCP Bridge 0.13.0._
+_Generated 2026-10-30 from VRoid MCP Bridge 0.14.0._

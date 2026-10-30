@@ -264,6 +264,16 @@ def outfit_tools_section() -> list[str]:
         "| Simple preset | change the garment / shoes / socks | `vroid_list_presets(filter='Tops'|'Bottoms'|'Onepiece'|'Shoes'|'Socks')`, `vroid_apply_preset`, `vroid_apply_custom`, `vroid_remove_item` |",
         "| Simple color | change a preset's exposed color slots | `vroid_clothing_colors(group=...)`, `vroid_set_color(group=..., key=..., r,g,b)` |",
         "| Complex texture | recolor a layer, export/import a PNG | `vroid_begin_clothing_edit(group=...)`, `vroid_list_layers`, `vroid_recolor_layer`, `vroid_export_layer`, `vroid_import_layer` |",
+        "| Preset parameters | skirt/sleeve/shoulder size sliders shown in Customize; stored in the preset template, not exposed | `vroid_get_item_params` (diagnostic) |",
+        "",
+        "Clothing presets can also show **Parameters** in VRoid's Customize panel (skirt tighter/wider/shorter/longer, "
+        "sleeve length, shoulder width, collar flatness...). They are **not model parameters**: the `.vroid` file keeps "
+        "them as preset-template entries (element keys such as `BlendShape_BlendShape.N00_001_03_Bottoms.Narrow`, "
+        "blendshape paths such as `Model.N00.UniformSkirt.BlendShape.Narrow`), and VRoid does not register them in "
+        "`TransferableGroups`. `vroid_get_params` therefore returns only the item's `Common.Color.Base` and "
+        "`Common.Color.Shade`. `vroid_get_item_params` lists every parameter VRoid does expose (including groups "
+        "missing from `vroid_list_groups`) plus the model's global parameters; at the time of writing the preset "
+        "parameters are not among them.",
         "",
         "`Onepiece` replaces Tops and Bottoms; `ClothingSet` can replace the whole outfit. After any whole-set apply, "
         "call `vroid_list_groups` because the number and ids of clothing groups can change. "
@@ -566,7 +576,7 @@ vroid_face_preview(name='', weight=0)      # reset
 python tools/gen_agent_reference_en.py
 ```""",
         "",
-        f"_Generated {datetime.date.today().isoformat()} from VRoid MCP Bridge 0.13.0._",
+        f"_Generated {datetime.date.today().isoformat()} from VRoid MCP Bridge 0.14.0._",
         "",
     ]
 
@@ -575,7 +585,7 @@ def main() -> None:
     lines: list[str] = [
         "# VRoid MCP Bridge — Agent Reference (English)",
         "",
-        "Version 0.13.0 · generated from the live MCP tool registry and a model-open N00 session.",
+        "Version 0.14.0 · generated from the live MCP tool registry and a model-open N00 session.",
         "",
         "Audience: an AI agent using the **`vroid`** MCP server through DeepSeek Harness (or any MCP client). "
         "It assumes no access to the VRoid Studio or VRoid MCP source code. The server, plugin, Python runtime "
@@ -583,7 +593,7 @@ def main() -> None:
         "",
         "## 1. What is available",
         "",
-        "- **52 MCP tools** named `vroid_*`; names, arguments and JSON schemas are available from the client's `tools/list`.",
+        f"- **{len(v.TOOLS)} MCP tools** named `vroid_*`; names, arguments and JSON schemas are available from the client's `tools/list`.",
         "- **One open model at a time**. Edits are real VRoid edits, undoable with Ctrl+Z / `vroid_undo`.",
         "- **`vroid_help`** works without VRoid and supports `en`, `fr`, `ja`, `zh-CN`; topics: "
         "`overview`, `tools`, `lifecycle`, `export`, `framing`, `thumbnails`, `colors`, `outfit`, `sessions`, "

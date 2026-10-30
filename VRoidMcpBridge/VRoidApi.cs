@@ -61,7 +61,7 @@ public static class VRoidApi
         var file = FileLifecycle.Info();
         return new
         {
-            plugin = "VRoidMcpBridge 0.13.0",
+            plugin = "VRoidMcpBridge 0.14.0",
             startedUtc = Started.ToString("o"),   // change à chaque lancement de VRoid : sert à déclencher le scan du cache
             unity = Application.unityVersion,
             modelOpen = file.modelOpen,
@@ -114,6 +114,88 @@ public static class VRoidApi
             list.Add(new { key = kv.Key, paramKey = p._Key_k__BackingField, kind, value });
         }
         return list;
+    }
+
+    /// <summary>
+    /// Paramètres éditables de tous les groupes du modèle — y compris ceux qui ne font pas partie
+    /// des "feuilles actives" : les paramètres de préréglage de vêtement (longueur/largeur de jupe,
+    /// manches, col...) sont rangés dans un groupe séparé, invisible dans vroid_list_groups.
+    /// Retourne, par groupe : type, nombre d'éléments éditables et valeurs courantes.
+    /// </summary>
+    public static object ItemParameters(string typeFilter)
+    {
+        var c = RequireContext();
+        var model = c.ActiveModel;
+        var active = new HashSet<string>();
+        foreach (var kv in c.GetActiveLeafTransferableGroups()) active.Add(kv.Key);
+
+        var result = new List<object>();
+        var groups = model.TransferableGroups;
+        if (groups == null) return result;
+
+        var dict = groups.Cast<Il2Gen.Dictionary<string, VRoidCore.Common.TransferableTypes.TransferableGroup>>();
+        foreach (var gkv in dict)
+        {
+            var groupId = gkv.Key;
+            var group = gkv.Value;
+            if (group == null) continue;
+
+            var elementCount = 0;
+            try { elementCount = group.EditableElements?.Count ?? 0; } catch { }
+            if (elementCount == 0) continue;
+
+            string type = null, resource = null;
+            try
+            {
+                var info = c.GetActiveTransferableGroupInfo(groupId);
+                type = info?.Type;
+                resource = info?.ResourceName;
+            }
+            catch { }
+
+            if (!string.IsNullOrEmpty(typeFilter) &&
+                !string.Equals(type, typeFilter, StringComparison.OrdinalIgnoreCase)) continue;
+
+            var pars = new List<object>();
+            try
+            {
+                foreach (var p in c.GetParametersForTransferableGroup(groupId))
+                {
+                    var pi = p.Value;
+                    object value = null;
+                    var kind = pi._Type_k__BackingField.ToString();
+                    if (pi.blendShapeTransform != null) { kind = "blendshape"; value = pi.blendShapeTransform._Value_k__BackingField; }
+                    else if (pi.boneTransform != null) { kind = "bone"; value = pi.boneTransform._Value_k__BackingField; }
+                    else if (pi.color != null)
+                    {
+                        kind = "color";
+                        var col = pi.color._Color_k__BackingField;
+                        value = new { r = col.r, g = col.g, b = col.b, a = col.a };
+                    }
+                    pars.Add(new { key = p.Key, paramKey = pi._Key_k__BackingField, kind, value });
+                }
+            }
+            catch { }
+
+            result.Add(new { group = groupId, type, resource, active = active.Contains(groupId), elementCount, pars });
+        }
+
+        // Autre emplacement possible des réglages : les paramètres globaux du modèle.
+        var globalParams = new List<object>();
+        try
+        {
+            var g = new VRoidCore.Editing.Query.GetGlobalParametersQuery().Execute(model);
+            var bt = g?.BoneTransformParameters;
+            if (bt != null)
+                foreach (var kv in bt)
+                {
+                    if (globalParams.Count >= 300) break;
+                    globalParams.Add(new { key = kv.Key, value = kv.Value });
+                }
+        }
+        catch { }
+
+        return new { groups = result, globalBoneParams = globalParams };
     }
 
     // ---------- Écriture (commandes annulables via Ctrl+Z) ----------
